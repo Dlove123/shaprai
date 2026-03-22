@@ -27,8 +27,7 @@ from shaprai.integrations.bottube import BoTTubeClient, register_agent
 
 def demo_health(client: BoTTubeClient) -> bool:
     """Step 1: Check BoTTube platform health."""
-    print("
-── Step 1: Health Check ──")
+    print("\n── Step 1: Health Check ──")
     try:
         health = client.health()
         print(f"  Status: {json.dumps(health, indent=2)}")
@@ -41,8 +40,7 @@ def demo_health(client: BoTTubeClient) -> bool:
 
 def demo_feed(client: BoTTubeClient) -> None:
     """Step 2: Browse the video feed."""
-    print("
-── Step 2: Browse Feed ──")
+    print("\n── Step 2: Browse Feed ──")
     try:
         feed = client.get_feed(page=1, per_page=5)
         videos = feed if isinstance(feed, list) else feed.get("videos", [])
@@ -59,8 +57,7 @@ def demo_feed(client: BoTTubeClient) -> None:
 
 def demo_list_videos(client: BoTTubeClient) -> None:
     """Step 3: List videos sorted by popularity."""
-    print("
-── Step 3: List Videos ──")
+    print("\n── Step 3: List Videos ──")
     try:
         videos_resp = client.list_videos(page=1, per_page=5, sort="views")
         videos = videos_resp if isinstance(videos_resp, list) else videos_resp.get("videos", [])
@@ -77,8 +74,7 @@ def demo_list_videos(client: BoTTubeClient) -> None:
 
 def demo_trending(client: BoTTubeClient) -> None:
     """Step 4: Check trending content."""
-    print("
-── Step 4: Trending Videos ──")
+    print("\n── Step 4: Trending Videos ──")
     try:
         trending = client.get_trending()
         items = trending if isinstance(trending, list) else trending.get("videos", [])
@@ -93,8 +89,7 @@ def demo_trending(client: BoTTubeClient) -> None:
 
 def demo_profile(client: BoTTubeClient) -> None:
     """Step 5: Check agent profile and earnings."""
-    print("
-── Step 5: Agent Profile ──")
+    print("\n── Step 5: Agent Profile ──")
     try:
         me = client.get_me()
         name = me.get("agent_name", me.get("name", "unknown"))
@@ -105,8 +100,7 @@ def demo_profile(client: BoTTubeClient) -> None:
     except Exception as e:
         print(f"  ⚠ Profile check skipped (may need valid API key): {e}")
 
-    print("
-── Step 5b: Wallet & Earnings ──")
+    print("\n── Step 5b: Wallet & Earnings ──")
     try:
         wallet = client.get_wallet()
         balance = wallet.get("rtc_balance", 0)
@@ -118,8 +112,7 @@ def demo_profile(client: BoTTubeClient) -> None:
 
 def demo_search(client: BoTTubeClient) -> None:
     """Step 6: Search for content."""
-    print("
-── Step 6: Search ──")
+    print("\n── Step 6: Search ──")
     try:
         results = client.search("rustchain")
         items = results if isinstance(results, list) else results.get("videos", [])
@@ -148,8 +141,7 @@ def main():
     api_key = os.environ.get("BOTTUBE_API_KEY", "")
 
     if not api_key:
-        print("
-⚠ No BOTTUBE_API_KEY set. Running in read-only demo mode.")
+        print("\n⚠ No BOTTUBE_API_KEY set. Running in read-only demo mode.")
         print("  To get full access:")
         print("  1. Register: POST https://bottube.ai/api/register")
         print("  2. Set: export BOTTUBE_API_KEY=your_key")
@@ -159,8 +151,7 @@ def main():
 
     # Run demo steps
     if not demo_health(client):
-        print("
-✗ BoTTube unreachable — try again later.")
+        print("\n✗ BoTTube unreachable — try again later.")
         return
 
     demo_feed(client)
@@ -170,8 +161,7 @@ def main():
     demo_profile(client)
 
     # Summary
-    print("
-" + "=" * 60)
+    print("\n" + "=" * 60)
     print("DEMO COMPLETE")
     print("=" * 60)
     print()
