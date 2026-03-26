@@ -14,8 +14,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from shaprai.sanctuary.principles import (SOPHIACORE_PRINCIPLES,
-                                          get_driftlock_anchors)
+from shaprai.sanctuary.principles import SOPHIACORE_PRINCIPLES, get_driftlock_anchors
 
 # Agents must score at or above this threshold to graduate
 ELYAN_CLASS_THRESHOLD = 0.85

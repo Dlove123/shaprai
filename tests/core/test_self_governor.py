@@ -3,9 +3,14 @@ from pathlib import Path
 import pytest
 import yaml
 
-from shaprai.core.self_governor import (AgentMetrics, GovernanceAction,
-                                        adapt_parameters, check_drift,
-                                        collect_metrics, evaluate_performance)
+from shaprai.core.self_governor import (
+    AgentMetrics,
+    GovernanceAction,
+    adapt_parameters,
+    check_drift,
+    collect_metrics,
+    evaluate_performance,
+)
 
 
 def test_composite_score():

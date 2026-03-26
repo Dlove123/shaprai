@@ -13,14 +13,26 @@ import pytest
 # Ensure examples are importable
 sys.path.insert(0, str(Path(__file__).parent.parent / "examples"))
 
-from examples.code_review_agent import (ReviewFinding, ReviewReport,
-                                        review_code, review_pr_comment)
-from examples.content_summarizer_agent import (Summary, summarize_pr_diff,
-                                               summarize_text,
-                                               summarize_thread)
-from examples.github_triage_agent import (TriageResult, demo_triage,
-                                          find_duplicates, score_priority,
-                                          suggest_labels, triage_issue)
+from examples.code_review_agent import (
+    ReviewFinding,
+    ReviewReport,
+    review_code,
+    review_pr_comment,
+)
+from examples.content_summarizer_agent import (
+    Summary,
+    summarize_pr_diff,
+    summarize_text,
+    summarize_thread,
+)
+from examples.github_triage_agent import (
+    TriageResult,
+    demo_triage,
+    find_duplicates,
+    score_priority,
+    suggest_labels,
+    triage_issue,
+)
 from shaprai.sanctuary.quality_gate import QualityGate
 
 # ═══════════════════════════════════════════════════════════

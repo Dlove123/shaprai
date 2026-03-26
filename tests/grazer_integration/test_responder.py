@@ -4,9 +4,11 @@
 import pytest
 
 from shaprai.integrations.grazer.discovery import DiscoveredPost
-from shaprai.integrations.grazer.responder import (GeneratedResponse,
-                                                   GrazerResponder,
-                                                   ResponderConfig)
+from shaprai.integrations.grazer.responder import (
+    GeneratedResponse,
+    GrazerResponder,
+    ResponderConfig,
+)
 
 
 @pytest.fixture

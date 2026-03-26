@@ -11,13 +11,22 @@ from typing import Optional
 import click
 
 from shaprai import __version__
-from shaprai.a11y import (OutputFormat, emit_error, emit_key_value,
-                          emit_success, emit_table, set_output_format)
+from shaprai.a11y import (
+    OutputFormat,
+    emit_error,
+    emit_key_value,
+    emit_success,
+    emit_table,
+    set_output_format,
+)
 from shaprai.core.fleet_manager import FleetManager
-from shaprai.core.lifecycle import (AgentState, create_agent, deploy_agent,
-                                    get_agent_status)
-from shaprai.core.template_engine import (fork_template, list_templates,
-                                          load_template)
+from shaprai.core.lifecycle import (
+    AgentState,
+    create_agent,
+    deploy_agent,
+    get_agent_status,
+)
+from shaprai.core.template_engine import fork_template, list_templates, load_template
 from shaprai.prerequisites import require_elyan_ecosystem
 from shaprai.sanctuary.educator import SanctuaryEducator
 from shaprai.sanctuary.quality_gate import ELYAN_CLASS_THRESHOLD, QualityGate

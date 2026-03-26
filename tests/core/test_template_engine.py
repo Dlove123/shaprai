@@ -3,9 +3,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from shaprai.core.template_engine import (AgentTemplate, fork_template,
-                                          list_templates, load_template,
-                                          save_template)
+from shaprai.core.template_engine import (
+    AgentTemplate,
+    fork_template,
+    list_templates,
+    load_template,
+    save_template,
+)
 
 
 def test_agent_template_defaults():

@@ -30,8 +30,7 @@ from typing import Any, Dict, List, Optional, Tuple
 # Allow running from repo root
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shaprai.integrations.elyan_ecosystem import (EcosystemConfig,
-                                                  ElyanEcosystem)
+from shaprai.integrations.elyan_ecosystem import EcosystemConfig, ElyanEcosystem
 
 # ── Priority keywords ────────────────────────────────────────
 

@@ -26,8 +26,7 @@ from pathlib import Path
 # Ensure shaprai is importable when running from the repo root
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from shaprai.integrations.beacon_mesh import (BeaconMeshNetwork,
-                                              UDPDiscoveryListener)
+from shaprai.integrations.beacon_mesh import BeaconMeshNetwork, UDPDiscoveryListener
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 

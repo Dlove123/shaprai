@@ -13,12 +13,16 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from shaprai.integrations.grazer.discovery import (DiscoveredPost,
-                                                   DiscoveryConfig,
-                                                   GrazerDiscovery)
-from shaprai.integrations.grazer.responder import (GeneratedResponse,
-                                                   GrazerResponder,
-                                                   ResponderConfig)
+from shaprai.integrations.grazer.discovery import (
+    DiscoveredPost,
+    DiscoveryConfig,
+    GrazerDiscovery,
+)
+from shaprai.integrations.grazer.responder import (
+    GeneratedResponse,
+    GrazerResponder,
+    ResponderConfig,
+)
 
 logger = logging.getLogger(__name__)
 

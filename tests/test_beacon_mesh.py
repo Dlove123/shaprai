@@ -22,12 +22,17 @@ from pathlib import Path
 
 import pytest
 
-from shaprai.integrations.beacon_mesh import (ENVELOPE_PROTOCOL_VERSION,
-                                              BeaconIdentity,
-                                              BeaconMeshNetwork, MeshEnvelope,
-                                              MeshPeer, UDPDiscoveryListener,
-                                              _classify_message,
-                                              create_identity, generate_reply)
+from shaprai.integrations.beacon_mesh import (
+    ENVELOPE_PROTOCOL_VERSION,
+    BeaconIdentity,
+    BeaconMeshNetwork,
+    MeshEnvelope,
+    MeshPeer,
+    UDPDiscoveryListener,
+    _classify_message,
+    create_identity,
+    generate_reply,
+)
 
 # ─────────────────────────────────────────────────
 # Fixtures

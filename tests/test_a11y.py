@@ -21,9 +21,15 @@ import click
 import pytest
 from click.testing import CliRunner
 
-from shaprai.a11y import (OutputFormat, emit_error, emit_key_value,
-                          emit_success, emit_table, get_output_format,
-                          set_output_format)
+from shaprai.a11y import (
+    OutputFormat,
+    emit_error,
+    emit_key_value,
+    emit_success,
+    emit_table,
+    get_output_format,
+    set_output_format,
+)
 
 
 @pytest.fixture

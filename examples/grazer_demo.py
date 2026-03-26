@@ -23,12 +23,16 @@ from typing import Any, Dict, List
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from shaprai.integrations.grazer.agent import GrazerAgent, GrazerAgentConfig
-from shaprai.integrations.grazer.discovery import (DiscoveredPost,
-                                                   DiscoveryConfig,
-                                                   GrazerDiscovery)
-from shaprai.integrations.grazer.responder import (GeneratedResponse,
-                                                   GrazerResponder,
-                                                   ResponderConfig)
+from shaprai.integrations.grazer.discovery import (
+    DiscoveredPost,
+    DiscoveryConfig,
+    GrazerDiscovery,
+)
+from shaprai.integrations.grazer.responder import (
+    GeneratedResponse,
+    GrazerResponder,
+    ResponderConfig,
+)
 
 logging.basicConfig(
     level=logging.INFO,

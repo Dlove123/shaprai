@@ -3,9 +3,11 @@
 
 import pytest
 
-from shaprai.integrations.grazer.discovery import (DiscoveredPost,
-                                                   DiscoveryConfig,
-                                                   GrazerDiscovery)
+from shaprai.integrations.grazer.discovery import (
+    DiscoveredPost,
+    DiscoveryConfig,
+    GrazerDiscovery,
+)
 
 
 @pytest.fixture

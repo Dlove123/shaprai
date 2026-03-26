@@ -19,10 +19,16 @@ import time
 import pytest
 import responses
 
-from shaprai.elyan_bus import (BEACON_RELAY, GAS_FEE_TEXT_RELAY,
-                               GRADUATION_FEE, PLATFORM_FEE_RATE,
-                               RUSTCHAIN_API, SANCTUARY_SESSION_FEE,
-                               ElyanAgent, ElyanBus)
+from shaprai.elyan_bus import (
+    BEACON_RELAY,
+    GAS_FEE_TEXT_RELAY,
+    GRADUATION_FEE,
+    PLATFORM_FEE_RATE,
+    RUSTCHAIN_API,
+    SANCTUARY_SESSION_FEE,
+    ElyanAgent,
+    ElyanBus,
+)
 
 # ─────────────────────────────────────────────────
 # Fixtures

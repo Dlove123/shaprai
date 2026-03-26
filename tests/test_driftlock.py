@@ -9,10 +9,14 @@ from unittest.mock import MagicMock, Mock, patch
 import numpy as np
 import pytest
 
-from shaprai.core.driftlock import (DEFAULT_DRIFT_THRESHOLD,
-                                    DEFAULT_WINDOW_SIZE, DriftLock,
-                                    DriftLockConfig, DriftLockResult,
-                                    create_driftlock_from_template)
+from shaprai.core.driftlock import (
+    DEFAULT_DRIFT_THRESHOLD,
+    DEFAULT_WINDOW_SIZE,
+    DriftLock,
+    DriftLockConfig,
+    DriftLockResult,
+    create_driftlock_from_template,
+)
 
 
 class TestDriftLockConfig:

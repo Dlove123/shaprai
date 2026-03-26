@@ -3,9 +3,14 @@ from pathlib import Path
 
 import pytest
 
-from shaprai.core.lifecycle import (AgentState, create_agent, deploy_agent,
-                                    get_agent_status, retire_agent,
-                                    transition_state)
+from shaprai.core.lifecycle import (
+    AgentState,
+    create_agent,
+    deploy_agent,
+    get_agent_status,
+    retire_agent,
+    transition_state,
+)
 
 
 def test_create_agent(temp_agents_dir, mock_template):
