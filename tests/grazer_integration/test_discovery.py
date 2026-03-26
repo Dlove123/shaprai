@@ -3,11 +3,9 @@
 
 import pytest
 
-from shaprai.integrations.grazer.discovery import (
-    DiscoveredPost,
-    DiscoveryConfig,
-    GrazerDiscovery,
-)
+from shaprai.integrations.grazer.discovery import (DiscoveredPost,
+                                                   DiscoveryConfig,
+                                                   GrazerDiscovery)
 
 
 @pytest.fixture
@@ -93,5 +91,6 @@ class TestGrazerDiscovery:
     def test_should_scan_after_recent(self, discovery_config: DiscoveryConfig) -> None:
         discovery = GrazerDiscovery(discovery_config)
         import time
+
         discovery._last_scan = time.time()
         assert discovery.should_scan() is False

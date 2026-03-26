@@ -102,60 +102,72 @@ class MCPAgent:
 
     def _register_default_tools(self) -> None:
         """Register Beacon and Grazer as default tools."""
-        self.register_tool(MCPTool(
-            name="beacon_heartbeat",
-            description="Send a heartbeat to the Beacon discovery service to confirm agent is alive.",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "metrics": {
-                        "type": "object",
-                        "description": "Optional metrics to include in heartbeat",
+        self.register_tool(
+            MCPTool(
+                name="beacon_heartbeat",
+                description="Send a heartbeat to the Beacon discovery service to confirm agent is alive.",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "metrics": {
+                            "type": "object",
+                            "description": "Optional metrics to include in heartbeat",
+                        },
                     },
                 },
-            },
-            handler=self._beacon_heartbeat,
-        ))
+                handler=self._beacon_heartbeat,
+            )
+        )
 
-        self.register_tool(MCPTool(
-            name="grazer_discover",
-            description="Discover relevant content across platforms using Grazer.",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "platforms": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "Platforms to search (github, moltbook, bottube)",
+        self.register_tool(
+            MCPTool(
+                name="grazer_discover",
+                description="Discover relevant content across platforms using Grazer.",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "platforms": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Platforms to search (github, moltbook, bottube)",
+                        },
+                        "topics": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Topic filters",
+                        },
                     },
-                    "topics": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "Topic filters",
-                    },
+                    "required": ["platforms"],
                 },
-                "required": ["platforms"],
-            },
-            handler=self._grazer_discover,
-        ))
+                handler=self._grazer_discover,
+            )
+        )
 
-        self.register_tool(MCPTool(
-            name="grazer_engage",
-            description="Engage with discovered content (comment, review, claim).",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "target_url": {"type": "string", "description": "URL to engage with"},
-                    "action": {
-                        "type": "string",
-                        "enum": ["comment", "review", "claim", "upvote", "reply"],
+        self.register_tool(
+            MCPTool(
+                name="grazer_engage",
+                description="Engage with discovered content (comment, review, claim).",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "target_url": {
+                            "type": "string",
+                            "description": "URL to engage with",
+                        },
+                        "action": {
+                            "type": "string",
+                            "enum": ["comment", "review", "claim", "upvote", "reply"],
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Text content for the engagement",
+                        },
                     },
-                    "content": {"type": "string", "description": "Text content for the engagement"},
+                    "required": ["target_url", "action"],
                 },
-                "required": ["target_url", "action"],
-            },
-            handler=self._grazer_engage,
-        ))
+                handler=self._grazer_engage,
+            )
+        )
 
     def register_tool(self, tool: MCPTool) -> None:
         """Register a tool with the agent.
@@ -195,7 +207,9 @@ class MCPAgent:
             KeyError: If the tool is not registered.
         """
         if tool_name not in self.tools:
-            raise KeyError(f"Tool '{tool_name}' not registered. Available: {list(self.tools.keys())}")
+            raise KeyError(
+                f"Tool '{tool_name}' not registered. Available: {list(self.tools.keys())}"
+            )
 
         tool = self.tools[tool_name]
         logger.info("Executing tool: %s", tool_name)
@@ -215,7 +229,7 @@ class MCPAgent:
 
         # Trim history if needed (keep system prompt)
         if len(self.history) > self.max_history:
-            self.history = self.history[-self.max_history:]
+            self.history = self.history[-self.max_history :]
 
     def get_context(self) -> List[Dict[str, str]]:
         """Get the full conversation context for LLM input.
@@ -232,7 +246,9 @@ class MCPAgent:
     #  Default tool handlers
     # ------------------------------------------------------------------- #
 
-    def _beacon_heartbeat(self, metrics: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def _beacon_heartbeat(
+        self, metrics: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Beacon heartbeat tool handler."""
         try:
             from shaprai.integrations.beacon import update_heartbeat

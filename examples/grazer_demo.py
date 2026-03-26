@@ -22,9 +22,13 @@ from typing import Any, Dict, List
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from shaprai.integrations.grazer.discovery import DiscoveredPost, DiscoveryConfig, GrazerDiscovery
-from shaprai.integrations.grazer.responder import GeneratedResponse, GrazerResponder, ResponderConfig
 from shaprai.integrations.grazer.agent import GrazerAgent, GrazerAgentConfig
+from shaprai.integrations.grazer.discovery import (DiscoveredPost,
+                                                   DiscoveryConfig,
+                                                   GrazerDiscovery)
+from shaprai.integrations.grazer.responder import (GeneratedResponse,
+                                                   GrazerResponder,
+                                                   ResponderConfig)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -184,7 +188,13 @@ def run_demo() -> Dict[str, Any]:
     config = GrazerAgentConfig(
         agent_name="grazer_discoverer",
         platforms=["moltbook", "bottube"],
-        topics=["ai_agents", "open_source", "machine_learning", "developer_tools", "llm_fine_tuning"],
+        topics=[
+            "ai_agents",
+            "open_source",
+            "machine_learning",
+            "developer_tools",
+            "llm_fine_tuning",
+        ],
         quality_threshold=0.8,
         discovery_interval=300,
         max_responses_per_hour=10,
@@ -216,14 +226,23 @@ def run_demo() -> Dict[str, Any]:
     logger.info("-" * 40)
 
     posts = create_simulated_discovery(discovery_config)
-    logger.info("Scanned %d platforms: %s", len(config.platforms), ", ".join(config.platforms))
-    logger.info("Found %d posts total, %d above quality threshold (%.1f)",
-                len(SIMULATED_POSTS), len(posts), config.quality_threshold)
+    logger.info(
+        "Scanned %d platforms: %s", len(config.platforms), ", ".join(config.platforms)
+    )
+    logger.info(
+        "Found %d posts total, %d above quality threshold (%.1f)",
+        len(SIMULATED_POSTS),
+        len(posts),
+        config.quality_threshold,
+    )
 
     for i, post in enumerate(posts, 1):
         logger.info(
             "  [%d] [%s] %.2f — %s",
-            i, post.platform.upper(), post.relevance_score, post.title,
+            i,
+            post.platform.upper(),
+            post.relevance_score,
+            post.title,
         )
         logger.info("       by @%s — %s", post.author, post.url)
 
@@ -256,13 +275,17 @@ def run_demo() -> Dict[str, Any]:
 
     moltbook_count = sum(1 for r in responses if r.post.platform == "moltbook")
     bottube_count = sum(1 for r in responses if r.post.platform == "bottube")
-    avg_quality = sum(r.quality_score for r in responses) / len(responses) if responses else 0
+    avg_quality = (
+        sum(r.quality_score for r in responses) / len(responses) if responses else 0
+    )
 
     logger.info("Total responses generated: %d", len(responses))
     logger.info("  Moltbook: %d", moltbook_count)
     logger.info("  BoTTube:  %d", bottube_count)
     logger.info("  Avg quality score: %.2f", avg_quality)
-    logger.info("  Platforms covered: %d (bonus eligible: +5 RTC)", len(config.platforms))
+    logger.info(
+        "  Platforms covered: %d (bonus eligible: +5 RTC)", len(config.platforms)
+    )
 
     # Build output
     output = {
@@ -329,7 +352,9 @@ def main() -> None:
     responses_dir = output_dir / "responses"
     responses_dir.mkdir(exist_ok=True)
     for i, resp in enumerate(output["responses"], 1):
-        resp_path = responses_dir / f"response_{i:02d}_{resp['platform']}_{resp['post_id']}.md"
+        resp_path = (
+            responses_dir / f"response_{i:02d}_{resp['platform']}_{resp['post_id']}.md"
+        )
         with open(resp_path, "w") as f:
             f.write(f"# Response to: {resp['title']}\n\n")
             f.write(f"**Platform:** {resp['platform']}\n")

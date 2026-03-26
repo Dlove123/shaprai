@@ -113,7 +113,9 @@ class FleetManager:
         with open(manifest_path, "r") as f:
             return yaml.safe_load(f)
 
-    def broadcast_update(self, message: str, state_filter: Optional[AgentState] = None) -> int:
+    def broadcast_update(
+        self, message: str, state_filter: Optional[AgentState] = None
+    ) -> int:
         """Broadcast an update message to fleet agents.
 
         Writes the message to each agent's update log for consumption
@@ -138,11 +140,13 @@ class FleetManager:
                 with open(updates_path, "r") as f:
                     updates = yaml.safe_load(f) or []
 
-            updates.append({
-                "message": message,
-                "timestamp": time.time(),
-                "acknowledged": False,
-            })
+            updates.append(
+                {
+                    "message": message,
+                    "timestamp": time.time(),
+                    "acknowledged": False,
+                }
+            )
 
             with open(updates_path, "w") as f:
                 yaml.dump(updates, f, default_flow_style=False, sort_keys=False)

@@ -2,16 +2,18 @@
 # Copyright (c) 2026 Elyan Labs
 """Template schema validation before publish."""
 
-import yaml
 import json
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+import yaml
 
 
 @dataclass
 class ValidationResult:
     """Result of template validation."""
+
     is_valid: bool
     errors: List[str]
     warnings: List[str]
@@ -25,10 +27,10 @@ class TemplateValidator:
 
     def validate(self, template_content: str) -> ValidationResult:
         """Validate a template file.
-        
+
         Args:
             template_content: YAML or JSON content of the template
-            
+
         Returns:
             ValidationResult with validation status and any errors/warnings
         """
@@ -66,7 +68,9 @@ class TemplateValidator:
             if not isinstance(name, str):
                 errors.append("name must be a string")
             elif not name.replace("-", "").replace("_", "").isalnum():
-                errors.append("name must be alphanumeric (hyphens and underscores allowed)")
+                errors.append(
+                    "name must be alphanumeric (hyphens and underscores allowed)"
+                )
 
         # Validate version (semver)
         if "version" in template:
@@ -88,7 +92,9 @@ class TemplateValidator:
             if not isinstance(model, dict):
                 errors.append("model must be an object")
             elif "base" not in model:
-                warnings.append("model.base is recommended for specifying the base model")
+                warnings.append(
+                    "model.base is recommended for specifying the base model"
+                )
 
         # Validate capabilities
         if "capabilities" in template:
@@ -114,7 +120,9 @@ class TemplateValidator:
             if not isinstance(description, str):
                 errors.append("description must be a string")
             elif len(description) > 500:
-                warnings.append(f"description is long ({len(description)} chars, recommend < 500)")
+                warnings.append(
+                    f"description is long ({len(description)} chars, recommend < 500)"
+                )
 
         return ValidationResult(
             is_valid=len(errors) == 0,
@@ -124,10 +132,10 @@ class TemplateValidator:
 
     def validate_file(self, template_path: Path) -> ValidationResult:
         """Validate a template file from path.
-        
+
         Args:
             template_path: Path to the template file
-            
+
         Returns:
             ValidationResult with validation status
         """
@@ -144,16 +152,17 @@ class TemplateValidator:
     def _is_valid_semver(self, version: str) -> bool:
         """Check if version is valid semver."""
         import re
+
         pattern = r"^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z0-9.-]+))?(?:\+([a-zA-Z0-9.-]+))?$"
         return bool(re.match(pattern, version))
 
 
 def validate_template(template_content: str) -> Tuple[bool, List[str], List[str]]:
     """Convenience function to validate a template.
-    
+
     Args:
         template_content: YAML or JSON content of the template
-        
+
     Returns:
         Tuple of (is_valid, errors, warnings)
     """

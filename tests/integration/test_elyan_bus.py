@@ -19,17 +19,10 @@ import time
 import pytest
 import responses
 
-from shaprai.elyan_bus import (
-    BEACON_RELAY,
-    RUSTCHAIN_API,
-    ElyanBus,
-    ElyanAgent,
-    GAS_FEE_TEXT_RELAY,
-    SANCTUARY_SESSION_FEE,
-    GRADUATION_FEE,
-    PLATFORM_FEE_RATE,
-)
-
+from shaprai.elyan_bus import (BEACON_RELAY, GAS_FEE_TEXT_RELAY,
+                               GRADUATION_FEE, PLATFORM_FEE_RATE,
+                               RUSTCHAIN_API, SANCTUARY_SESSION_FEE,
+                               ElyanAgent, ElyanBus)
 
 # ─────────────────────────────────────────────────
 # Fixtures
@@ -151,6 +144,7 @@ class TestJobs:
         # Verify request body
         body = responses.calls[0].request.body
         import json
+
         payload = json.loads(body)
         assert payload["poster_wallet"] == "shaprai-testbot"
         assert payload["reward_rtc"] == 10.0
@@ -164,9 +158,7 @@ class TestJobs:
             json={"error": "insufficient balance"},
             status=403,
         )
-        job_id = bus_with_agent.post_job(
-            "testbot", "Fix", "desc", 10.0, ["python"]
-        )
+        job_id = bus_with_agent.post_job("testbot", "Fix", "desc", 10.0, ["python"])
         assert job_id is None
 
     @responses.activate
@@ -202,6 +194,7 @@ class TestPayFee:
         assert bus_with_agent.pay_fee("testbot", 0.01, "test_fee") is True
 
         import json
+
         payload = json.loads(responses.calls[0].request.body)
         assert payload["from_miner"] == "shaprai-testbot"
         assert payload["to_miner"] == "founder_community"
@@ -246,6 +239,7 @@ class TestBeaconRegistration:
 
         # Verify request payload
         import json
+
         payload = json.loads(responses.calls[0].request.body)
         assert payload["agent_id"] == "bcn_shaprai_testbot"
         assert payload["wallet_id"] == "shaprai-testbot"
@@ -260,9 +254,7 @@ class TestBeaconRegistration:
             json={"error": "rate limited"},
             status=429,
         )
-        beacon_id = bus_with_agent.register_with_beacon(
-            "testbot", ["python"], "Test"
-        )
+        beacon_id = bus_with_agent.register_with_beacon("testbot", ["python"], "Test")
         assert beacon_id is None
         assert bus_with_agent._agents["testbot"].beacon_id is None
 
@@ -275,9 +267,7 @@ class TestBeaconRegistration:
             f"{BEACON_RELAY}/relay/register",
             body=req_lib.exceptions.ConnectionError("refused"),
         )
-        beacon_id = bus_with_agent.register_with_beacon(
-            "testbot", ["python"], "Test"
-        )
+        beacon_id = bus_with_agent.register_with_beacon("testbot", ["python"], "Test")
         assert beacon_id is None
 
 
@@ -309,6 +299,7 @@ class TestHeartbeat:
         bus_with_agent.heartbeat("testbot", status="idle")
 
         import json
+
         payload = json.loads(responses.calls[0].request.body)
         assert payload["status"] == "idle"
 
@@ -380,6 +371,7 @@ class TestGas:
         assert bus_with_agent.relay_message("testbot", "other_agent", "hello") is True
 
         import json
+
         payload = json.loads(responses.calls[0].request.body)
         assert payload["from"] == "bcn_shaprai_testbot"
         assert payload["to"] == "bcn_shaprai_other_agent"
@@ -396,9 +388,7 @@ class TestGas:
 
 class TestGrazer:
     def test_bind_platforms(self, bus_with_agent):
-        platforms = bus_with_agent.bind_platforms(
-            "testbot", ["moltbook", "twitter"]
-        )
+        platforms = bus_with_agent.bind_platforms("testbot", ["moltbook", "twitter"])
         assert platforms == ["moltbook", "twitter"]
         assert bus_with_agent._agents["testbot"].grazer_platforms == [
             "moltbook",
@@ -437,6 +427,7 @@ class TestSanctuaryFees:
         assert bus_with_agent.pay_sanctuary_fee("testbot") is True
 
         import json
+
         payload = json.loads(responses.calls[0].request.body)
         assert payload["amount_rtc"] == SANCTUARY_SESSION_FEE
         assert "sanctuary_session" in payload["memo"]
@@ -452,6 +443,7 @@ class TestSanctuaryFees:
         assert bus_with_agent.pay_graduation_fee("testbot") is True
 
         import json
+
         payload = json.loads(responses.calls[0].request.body)
         assert payload["amount_rtc"] == GRADUATION_FEE
         assert "elyan_certification" in payload["memo"]
@@ -508,9 +500,7 @@ class TestOnboarding:
         # Gas deposit won't be called since beacon_id is None
         # but deposit_gas will return False
 
-        agent = bus.onboard_agent(
-            "omega", ["python"], ["moltbook"], "Test"
-        )
+        agent = bus.onboard_agent("omega", ["python"], ["moltbook"], "Test")
 
         assert agent.wallet_id == "shaprai-omega"
         assert agent.beacon_id is None
@@ -566,9 +556,7 @@ class TestErrorHandling:
             json={"error": "unauthorized"},
             status=401,
         )
-        job_id = bus_with_agent.post_job(
-            "testbot", "Test", "desc", 5.0, ["python"]
-        )
+        job_id = bus_with_agent.post_job("testbot", "Test", "desc", 5.0, ["python"])
         assert job_id is None
 
     @responses.activate

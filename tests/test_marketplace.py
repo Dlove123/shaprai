@@ -2,16 +2,17 @@
 # Copyright (c) 2026 Elyan Labs
 """Unit tests for marketplace module."""
 
-import pytest
 import tempfile
 from pathlib import Path
 
-from shaprai.marketplace.registry import TemplateRegistry, Template
+import pytest
+
 from shaprai.marketplace.pricing import PricingEngine, calculate_purchase
+from shaprai.marketplace.registry import Template, TemplateRegistry
 from shaprai.marketplace.validator import TemplateValidator, validate_template
 
-
 # ============== Registry Tests ==============
+
 
 class TestTemplateRegistry:
     """Tests for TemplateRegistry."""
@@ -49,7 +50,7 @@ class TestTemplateRegistry:
             content="test",
         )
         self.registry.publish(template)
-        
+
         with pytest.raises(ValueError, match="already exists"):
             self.registry.publish(template)
 
@@ -65,7 +66,7 @@ class TestTemplateRegistry:
             content="content",
         )
         self.registry.publish(template)
-        
+
         result = self.registry.get("my-agent", "2.0.0")
         assert result is not None
         assert result.name == "my-agent"
@@ -85,23 +86,33 @@ class TestTemplateRegistry:
                 content=f"version: {v}",
             )
             self.registry.publish(template)
-        
+
         latest = self.registry.get_latest("evolving-agent")
         assert latest.version == "2.0.0"
 
     def test_search_by_tag(self):
         """Test searching by tag."""
         template1 = Template(
-            name="agent1", version="1.0.0", author="a",
-            description="", price_rtc=10, tags=["nlp", "chat"], content="",
+            name="agent1",
+            version="1.0.0",
+            author="a",
+            description="",
+            price_rtc=10,
+            tags=["nlp", "chat"],
+            content="",
         )
         template2 = Template(
-            name="agent2", version="1.0.0", author="a",
-            description="", price_rtc=10, tags=["vision"], content="",
+            name="agent2",
+            version="1.0.0",
+            author="a",
+            description="",
+            price_rtc=10,
+            tags=["vision"],
+            content="",
         )
         self.registry.publish(template1)
         self.registry.publish(template2)
-        
+
         results = self.registry.search(tag="nlp")
         assert len(results) == 1
         assert results[0].name == "agent1"
@@ -109,16 +120,26 @@ class TestTemplateRegistry:
     def test_search_by_author(self):
         """Test searching by author."""
         template1 = Template(
-            name="agent1", version="1.0.0", author="alice",
-            description="", price_rtc=10, tags=[], content="",
+            name="agent1",
+            version="1.0.0",
+            author="alice",
+            description="",
+            price_rtc=10,
+            tags=[],
+            content="",
         )
         template2 = Template(
-            name="agent2", version="1.0.0", author="bob",
-            description="", price_rtc=10, tags=[], content="",
+            name="agent2",
+            version="1.0.0",
+            author="bob",
+            description="",
+            price_rtc=10,
+            tags=[],
+            content="",
         )
         self.registry.publish(template1)
         self.registry.publish(template2)
-        
+
         results = self.registry.search(author="alice")
         assert len(results) == 1
         assert results[0].author == "alice"
@@ -126,19 +147,25 @@ class TestTemplateRegistry:
     def test_increment_downloads(self):
         """Test incrementing download count."""
         template = Template(
-            name="popular", version="1.0.0", author="a",
-            description="", price_rtc=10, tags=[], content="",
+            name="popular",
+            version="1.0.0",
+            author="a",
+            description="",
+            price_rtc=10,
+            tags=[],
+            content="",
         )
         self.registry.publish(template)
-        
+
         self.registry.increment_downloads("popular", "1.0.0")
         self.registry.increment_downloads("popular", "1.0.0")
-        
+
         result = self.registry.get("popular", "1.0.0")
         assert result.download_count == 2
 
 
 # ============== Pricing Tests ==============
+
 
 class TestPricingEngine:
     """Tests for PricingEngine."""
@@ -147,17 +174,17 @@ class TestPricingEngine:
         """Test revenue split calculation."""
         engine = PricingEngine()
         split = engine.calculate_split(100, "test", "1.0.0")
-        
+
         assert split.total_rtc == 100
         assert split.creator_amount == 90  # 90%
-        assert split.protocol_amount == 5   # 5%
-        assert split.relay_amount == 5      # 5%
+        assert split.protocol_amount == 5  # 5%
+        assert split.relay_amount == 5  # 5%
 
     def test_calculate_split_uneven(self):
         """Test split with uneven amounts."""
         engine = PricingEngine()
         split = engine.calculate_split(37, "test", "1.0.0")
-        
+
         # 37 * 0.90 = 33.3 -> 33
         # 37 * 0.05 = 1.85 -> 1
         # Remainder goes to relay: 37 - 33 - 1 = 3
@@ -195,6 +222,7 @@ class TestPricingEngine:
 
 
 # ============== Validator Tests ==============
+
 
 class TestTemplateValidator:
     """Tests for TemplateValidator."""

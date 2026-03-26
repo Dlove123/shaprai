@@ -26,7 +26,8 @@ from pathlib import Path
 # Ensure shaprai is importable when running from the repo root
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from shaprai.integrations.beacon_mesh import BeaconMeshNetwork, UDPDiscoveryListener
+from shaprai.integrations.beacon_mesh import (BeaconMeshNetwork,
+                                              UDPDiscoveryListener)
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 
@@ -92,30 +93,32 @@ def main() -> None:
     section("STEP 4 — Bidirectional Signed Envelope Exchange")
 
     conversations = [
-        ("alpha", "beta",  "Hello Beta! Mesh coordinator Alpha online. Status?"),
-        ("alpha", "beta",  "How many peers are you tracking on the mesh?"),
-        ("beta",  "gamma", "Hey Gamma, Alpha wants a network health check."),
+        ("alpha", "beta", "Hello Beta! Mesh coordinator Alpha online. Status?"),
+        ("alpha", "beta", "How many peers are you tracking on the mesh?"),
+        ("beta", "gamma", "Hey Gamma, Alpha wants a network health check."),
         ("gamma", "alpha", "Alpha, audit complete. All nodes nominal. No anomalies."),
         ("alpha", "gamma", "Thanks Gamma. Can you monitor the next 5 minutes?"),
-        ("beta",  "alpha", "Alpha, I'm seeing 3 peers. All heartbeats normal."),
-        ("gamma", "beta",  "Beta, I'm watching your link. Latency within bounds."),
+        ("beta", "alpha", "Alpha, I'm seeing 3 peers. All heartbeats normal."),
+        ("gamma", "beta", "Beta, I'm watching your link. Latency within bounds."),
     ]
 
     print()
     for i, (sender, receiver, msg) in enumerate(conversations, 1):
         env = mesh.send_message(sender, receiver, msg)
         sender_key = mesh.get_peer(sender).identity.public_key[:16]
-        print(f"  [{i:02d}] {sender:>5} → {receiver:<5}  "
-              f"sig={env.signature[:16]}... nonce={env.nonce[:8]}")
+        print(
+            f"  [{i:02d}] {sender:>5} → {receiver:<5}  "
+            f"sig={env.signature[:16]}... nonce={env.nonce[:8]}"
+        )
         print(f"       payload: \"{msg[:60]}{'...' if len(msg) > 60 else ''}\"")
 
     # ── Step 5: Personality-Consistent Replies ───
     section("STEP 5 — Personality-Consistent Replies")
 
     reply_prompts = [
-        ("alpha", "beta",  "Hey Beta, are you online?"),
-        ("alpha", "beta",  "What is the mesh topology right now?"),
-        ("beta",  "gamma", "Gamma, can we coordinate on the audit?"),
+        ("alpha", "beta", "Hey Beta, are you online?"),
+        ("alpha", "beta", "What is the mesh topology right now?"),
+        ("beta", "gamma", "Gamma, can we coordinate on the audit?"),
         ("gamma", "alpha", "Status report on all mesh links, Alpha."),
         ("alpha", "gamma", "How are the uptime metrics looking?"),
     ]
@@ -126,9 +129,9 @@ def main() -> None:
         reply = mesh.generate_reply(receiver, env)
         style = mesh.get_peer(receiver).personality_style
 
-        print(f"  {sender} → {receiver}: \"{msg}\"")
+        print(f'  {sender} → {receiver}: "{msg}"')
         print(f"  {receiver} replies ({style}):")
-        print(f"    \"{reply.payload}\"")
+        print(f'    "{reply.payload}"')
         print(f"    sig={reply.signature[:24]}... type={reply.envelope_type}")
         print()
 
@@ -165,14 +168,17 @@ def main() -> None:
 
     print("\n  Nodes:")
     for node in topo["nodes"]:
-        print(f"    • {node['agent_name']:>5}  "
-              f"beacon_id={node['beacon_id']}  "
-              f"style={node['personality_style']}")
+        print(
+            f"    • {node['agent_name']:>5}  "
+            f"beacon_id={node['beacon_id']}  "
+            f"style={node['personality_style']}"
+        )
 
     print("\n  Edges:")
     for edge in topo["edges"]:
-        print(f"    {edge['from']} → {edge['to']}  "
-              f"messages={edge['message_count']}")
+        print(
+            f"    {edge['from']} → {edge['to']}  " f"messages={edge['message_count']}"
+        )
 
     # ── Template YAMLs ───────────────────────────
     section("TEMPLATE YAMLS USED")

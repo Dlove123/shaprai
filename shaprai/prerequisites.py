@@ -15,14 +15,13 @@ without the full ecosystem:
 "No lamp is lit in isolation." — The Victorian Study
 """
 
-import sys
 import importlib
 import subprocess
+import sys
 from dataclasses import dataclass
 from typing import Optional
 
 import requests
-
 
 # ─────────────────────────────────────────────────
 # Elyan System Endpoints
@@ -37,6 +36,7 @@ GRAZER_TEST_URL = "https://bottube.ai/api/stats"
 @dataclass
 class PrerequisiteStatus:
     """Status of a single prerequisite."""
+
     name: str
     installed: bool
     reachable: bool
@@ -51,6 +51,7 @@ class PrerequisiteStatus:
 @dataclass
 class SystemCheck:
     """Full system prerequisite check result."""
+
     beacon: PrerequisiteStatus
     grazer: PrerequisiteStatus
     atlas: PrerequisiteStatus
@@ -71,18 +72,28 @@ class SystemCheck:
         if self.all_ok:
             lines.append("All prerequisites satisfied. ShaprAI ready.")
         else:
-            failed = [p.name for p in [self.beacon, self.grazer, self.atlas, self.rustchain] if not p.ok]
+            failed = [
+                p.name
+                for p in [self.beacon, self.grazer, self.atlas, self.rustchain]
+                if not p.ok
+            ]
             lines.append(f"BLOCKED: Missing prerequisites: {', '.join(failed)}")
             lines.append("ShaprAI requires the full Elyan ecosystem.")
             lines.append("Install missing components:")
             if not self.beacon.ok:
                 lines.append("  pip install beacon-skill  # or: cargo add beacon-skill")
             if not self.grazer.ok:
-                lines.append("  pip install grazer-skill  # or: npm install -g grazer-skill")
+                lines.append(
+                    "  pip install grazer-skill  # or: npm install -g grazer-skill"
+                )
             if not self.atlas.ok:
-                lines.append("  # Atlas is part of beacon-skill — ensure beacon relay is reachable")
+                lines.append(
+                    "  # Atlas is part of beacon-skill — ensure beacon relay is reachable"
+                )
             if not self.rustchain.ok:
-                lines.append("  # RustChain node must be running — see https://rustchain.org")
+                lines.append(
+                    "  # RustChain node must be running — see https://rustchain.org"
+                )
         return "\n".join(lines)
 
 
@@ -101,7 +112,9 @@ def _check_beacon() -> PrerequisiteStatus:
         try:
             result = subprocess.run(
                 ["cargo", "metadata", "--no-deps", "-q"],
-                capture_output=True, text=True, timeout=10,
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if "beacon-skill" in result.stdout:
                 installed = True
@@ -139,7 +152,9 @@ def _check_grazer() -> PrerequisiteStatus:
         try:
             result = subprocess.run(
                 ["grazer", "--version"],
-                capture_output=True, text=True, timeout=10,
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if result.returncode == 0:
                 installed = True
@@ -206,7 +221,11 @@ def _check_rustchain() -> PrerequisiteStatus:
         installed=True,  # RustChain is a network service
         reachable=reachable,
         version=version,
-        error=None if reachable else "RustChain node not reachable — check https://50.28.86.131/health",
+        error=(
+            None
+            if reachable
+            else "RustChain node not reachable — check https://50.28.86.131/health"
+        ),
     )
 
 

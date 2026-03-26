@@ -91,9 +91,7 @@ class ShaprCrewAgent:
             return self._crew_agent
 
         except ImportError:
-            raise ImportError(
-                "crewai not installed. Install with: pip install crewai"
-            )
+            raise ImportError("crewai not installed. Install with: pip install crewai")
 
     @classmethod
     def from_manifest(cls, manifest: Dict[str, Any]) -> "ShaprCrewAgent":
@@ -109,7 +107,9 @@ class ShaprCrewAgent:
         return cls(
             name=manifest.get("name", "unnamed"),
             role=personality.get("style", "general_assistant"),
-            goal=manifest.get("description", "Assist with tasks while maintaining principles"),
+            goal=manifest.get(
+                "description", "Assist with tasks while maintaining principles"
+            ),
             backstory=personality.get("backstory", ""),
             model=manifest.get("model", {}).get("base"),
         )
@@ -148,11 +148,13 @@ def create_crew(
             agent_name = task_spec.get("agent", agents[0].name)
             crew_agent = agent_map.get(agent_name, crew_agents[0])
 
-            crew_tasks.append(Task(
-                description=task_spec.get("description", ""),
-                expected_output=task_spec.get("expected_output", "Completed task"),
-                agent=crew_agent,
-            ))
+            crew_tasks.append(
+                Task(
+                    description=task_spec.get("description", ""),
+                    expected_output=task_spec.get("expected_output", "Completed task"),
+                    agent=crew_agent,
+                )
+            )
 
         crew = Crew(
             agents=crew_agents,
@@ -164,6 +166,4 @@ def create_crew(
         return crew
 
     except ImportError:
-        raise ImportError(
-            "crewai not installed. Install with: pip install crewai"
-        )
+        raise ImportError("crewai not installed. Install with: pip install crewai")

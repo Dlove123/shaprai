@@ -125,11 +125,13 @@ def transition_state(
     manifest = _load_manifest(name, agents_dir)
     old_state = manifest["state"]
     manifest["state"] = new_state.value
-    manifest.setdefault("state_history", []).append({
-        "from": old_state,
-        "to": new_state.value,
-        "timestamp": time.time(),
-    })
+    manifest.setdefault("state_history", []).append(
+        {
+            "from": old_state,
+            "to": new_state.value,
+            "timestamp": time.time(),
+        }
+    )
     _save_manifest(name, manifest, agents_dir)
     return manifest
 
@@ -155,10 +157,12 @@ def deploy_agent(
     manifest = _load_manifest(name, agents_dir)
     manifest["state"] = AgentState.DEPLOYED.value
     manifest["platforms"] = platforms
-    manifest.setdefault("deployment_history", []).append({
-        "platforms": platforms,
-        "timestamp": time.time(),
-    })
+    manifest.setdefault("deployment_history", []).append(
+        {
+            "platforms": platforms,
+            "timestamp": time.time(),
+        }
+    )
     _save_manifest(name, manifest, agents_dir)
     return manifest
 

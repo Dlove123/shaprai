@@ -26,7 +26,8 @@ from typing import Any, Dict, List, Optional
 # Allow running from repo root
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shaprai.integrations.elyan_ecosystem import ElyanEcosystem, EcosystemConfig
+from shaprai.integrations.elyan_ecosystem import (EcosystemConfig,
+                                                  ElyanEcosystem)
 
 
 @dataclass
@@ -55,16 +56,18 @@ class Summary:
 def _tokenize_sentences(text: str) -> List[str]:
     """Split text into sentences."""
     # Simple sentence splitting on period, exclamation, question mark
-    sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
     return [s.strip() for s in sentences if s.strip() and len(s.split()) >= 3]
 
 
-def _score_sentence(sentence: str, word_freq: Counter, position: int, total: int) -> float:
+def _score_sentence(
+    sentence: str, word_freq: Counter, position: int, total: int
+) -> float:
     """Score a sentence for inclusion in the summary.
 
     Considers word frequency, sentence position, and length.
     """
-    words = re.findall(r'\w+', sentence.lower())
+    words = re.findall(r"\w+", sentence.lower())
     if not words:
         return 0.0
 
@@ -86,7 +89,7 @@ def _score_sentence(sentence: str, word_freq: Counter, position: int, total: int
     elif length > 40:
         length_score = 0.7
 
-    return (freq_score * 0.6 + position_score * 0.2 + length_score * 0.2)
+    return freq_score * 0.6 + position_score * 0.2 + length_score * 0.2
 
 
 def summarize_text(
@@ -118,18 +121,80 @@ def summarize_text(
 
     # Build word frequency (exclude common stop words)
     stop_words = {
-        "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
-        "have", "has", "had", "do", "does", "did", "will", "would", "shall",
-        "should", "may", "might", "can", "could", "to", "of", "in", "for",
-        "on", "with", "at", "by", "from", "as", "into", "through", "during",
-        "before", "after", "and", "but", "or", "nor", "not", "so", "yet",
-        "both", "either", "neither", "this", "that", "these", "those", "it",
-        "its", "they", "them", "their", "we", "our", "he", "she", "him",
-        "her", "his", "i", "me", "my", "you", "your",
+        "the",
+        "a",
+        "an",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "have",
+        "has",
+        "had",
+        "do",
+        "does",
+        "did",
+        "will",
+        "would",
+        "shall",
+        "should",
+        "may",
+        "might",
+        "can",
+        "could",
+        "to",
+        "of",
+        "in",
+        "for",
+        "on",
+        "with",
+        "at",
+        "by",
+        "from",
+        "as",
+        "into",
+        "through",
+        "during",
+        "before",
+        "after",
+        "and",
+        "but",
+        "or",
+        "nor",
+        "not",
+        "so",
+        "yet",
+        "both",
+        "either",
+        "neither",
+        "this",
+        "that",
+        "these",
+        "those",
+        "it",
+        "its",
+        "they",
+        "them",
+        "their",
+        "we",
+        "our",
+        "he",
+        "she",
+        "him",
+        "her",
+        "his",
+        "i",
+        "me",
+        "my",
+        "you",
+        "your",
     }
     all_words = []
     for s in sentences:
-        words = re.findall(r'\w+', s.lower())
+        words = re.findall(r"\w+", s.lower())
         all_words.extend(w for w in words if w not in stop_words and len(w) > 2)
 
     word_freq = Counter(all_words)
@@ -177,9 +242,9 @@ def summarize_pr_diff(diff_text: str, pr_title: str = "") -> Summary:
     Returns:
         Summary of the PR changes.
     """
-    files_changed = re.findall(r'^diff --git a/(.+?) b/', diff_text, re.MULTILINE)
-    additions = len(re.findall(r'^\+[^+]', diff_text, re.MULTILINE))
-    deletions = len(re.findall(r'^-[^-]', diff_text, re.MULTILINE))
+    files_changed = re.findall(r"^diff --git a/(.+?) b/", diff_text, re.MULTILINE)
+    additions = len(re.findall(r"^\+[^+]", diff_text, re.MULTILINE))
+    deletions = len(re.findall(r"^-[^-]", diff_text, re.MULTILINE))
 
     key_points = [
         f"{len(files_changed)} file(s) changed",
@@ -274,7 +339,9 @@ def main():
     result = summarize_text(article, title="RustChain Overview")
     print(f"  Title: {result.title}")
     print(f"  Original: {result.word_count_original} words")
-    print(f"  Summary: {result.word_count_summary} words ({result.compression_ratio:.0%} compression)")
+    print(
+        f"  Summary: {result.word_count_summary} words ({result.compression_ratio:.0%} compression)"
+    )
     print(f"  Text: {result.summary_text}")
     print(f"  Key points:")
     for kp in result.key_points[:3]:
@@ -299,7 +366,9 @@ diff --git a/tests/test_rustchain.py b/tests/test_rustchain.py
 -# TODO: add tests
 """
 
-    pr_result = summarize_pr_diff(diff, pr_title="Add multi-node failover for RustChain")
+    pr_result = summarize_pr_diff(
+        diff, pr_title="Add multi-node failover for RustChain"
+    )
     print(f"  Title: {pr_result.title}")
     print(f"  Summary: {pr_result.summary_text}")
     print(f"  Key points:")

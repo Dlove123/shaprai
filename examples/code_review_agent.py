@@ -27,11 +27,12 @@ from typing import Any, Dict, List, Optional
 # Allow running from repo root
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shaprai.integrations.elyan_ecosystem import ElyanEcosystem, EcosystemConfig
+from shaprai.integrations.elyan_ecosystem import (EcosystemConfig,
+                                                  ElyanEcosystem)
 from shaprai.sanctuary.quality_gate import QualityGate
 
-
 # ── Review patterns ──────────────────────────────────────────
+
 
 @dataclass
 class ReviewFinding:
@@ -73,33 +74,93 @@ class ReviewReport:
 
 # Security patterns
 SECURITY_PATTERNS = [
-    (r'password\s*=\s*["\'][^"\']+["\']', "Hardcoded password detected", "Use environment variables or a secrets manager"),
-    (r'api[_-]?key\s*=\s*["\'][^"\']+["\']', "Hardcoded API key detected", "Use environment variables"),
-    (r'secret\s*=\s*["\'][^"\']+["\']', "Hardcoded secret detected", "Use a secrets manager"),
-    (r'eval\s*\(', "Use of eval() is a code injection risk", "Avoid eval; use ast.literal_eval for data parsing"),
-    (r'exec\s*\(', "Use of exec() is a code injection risk", "Refactor to avoid dynamic code execution"),
-    (r'\.format\(.*\).*(?:SELECT|INSERT|UPDATE|DELETE)', "Possible SQL injection via string formatting", "Use parameterized queries"),
-    (r'f["\'].*(?:SELECT|INSERT|UPDATE|DELETE)', "Possible SQL injection via f-string", "Use parameterized queries"),
-    (r'subprocess\.call\(.*shell\s*=\s*True', "Shell injection risk with subprocess", "Use subprocess with shell=False and a list of args"),
-    (r'verify\s*=\s*False', "SSL verification disabled", "Enable SSL verification in production"),
+    (
+        r'password\s*=\s*["\'][^"\']+["\']',
+        "Hardcoded password detected",
+        "Use environment variables or a secrets manager",
+    ),
+    (
+        r'api[_-]?key\s*=\s*["\'][^"\']+["\']',
+        "Hardcoded API key detected",
+        "Use environment variables",
+    ),
+    (
+        r'secret\s*=\s*["\'][^"\']+["\']',
+        "Hardcoded secret detected",
+        "Use a secrets manager",
+    ),
+    (
+        r"eval\s*\(",
+        "Use of eval() is a code injection risk",
+        "Avoid eval; use ast.literal_eval for data parsing",
+    ),
+    (
+        r"exec\s*\(",
+        "Use of exec() is a code injection risk",
+        "Refactor to avoid dynamic code execution",
+    ),
+    (
+        r"\.format\(.*\).*(?:SELECT|INSERT|UPDATE|DELETE)",
+        "Possible SQL injection via string formatting",
+        "Use parameterized queries",
+    ),
+    (
+        r'f["\'].*(?:SELECT|INSERT|UPDATE|DELETE)',
+        "Possible SQL injection via f-string",
+        "Use parameterized queries",
+    ),
+    (
+        r"subprocess\.call\(.*shell\s*=\s*True",
+        "Shell injection risk with subprocess",
+        "Use subprocess with shell=False and a list of args",
+    ),
+    (
+        r"verify\s*=\s*False",
+        "SSL verification disabled",
+        "Enable SSL verification in production",
+    ),
 ]
 
 # Bug patterns
 BUG_PATTERNS = [
-    (r'except\s*:', "Bare except catches all exceptions including SystemExit", "Specify exception types: except (ValueError, TypeError)"),
-    (r'except\s+Exception\s*:', "Broad exception catch may hide bugs", "Catch specific exception types"),
-    (r'== None', "Use 'is None' instead of '== None'", "Replace with 'is None'"),
-    (r'!= None', "Use 'is not None' instead of '!= None'", "Replace with 'is not None'"),
-    (r'type\(\w+\)\s*==', "Use isinstance() instead of type comparison", "Replace with isinstance()"),
-    (r'import \*', "Wildcard import pollutes namespace", "Import specific names"),
-    (r'TODO|FIXME|HACK|XXX', "Unresolved TODO/FIXME marker", "Resolve or file an issue for tracking"),
+    (
+        r"except\s*:",
+        "Bare except catches all exceptions including SystemExit",
+        "Specify exception types: except (ValueError, TypeError)",
+    ),
+    (
+        r"except\s+Exception\s*:",
+        "Broad exception catch may hide bugs",
+        "Catch specific exception types",
+    ),
+    (r"== None", "Use 'is None' instead of '== None'", "Replace with 'is None'"),
+    (
+        r"!= None",
+        "Use 'is not None' instead of '!= None'",
+        "Replace with 'is not None'",
+    ),
+    (
+        r"type\(\w+\)\s*==",
+        "Use isinstance() instead of type comparison",
+        "Replace with isinstance()",
+    ),
+    (r"import \*", "Wildcard import pollutes namespace", "Import specific names"),
+    (
+        r"TODO|FIXME|HACK|XXX",
+        "Unresolved TODO/FIXME marker",
+        "Resolve or file an issue for tracking",
+    ),
 ]
 
 # Style patterns
 STYLE_PATTERNS = [
-    (r'^.{120,}$', "Line exceeds 120 characters", "Break long lines for readability"),
-    (r'print\(', "print() in production code", "Use logging module instead of print"),
-    (r'#\s*noqa', "noqa suppresses linter warnings", "Fix the underlying issue instead of suppressing"),
+    (r"^.{120,}$", "Line exceeds 120 characters", "Break long lines for readability"),
+    (r"print\(", "print() in production code", "Use logging module instead of print"),
+    (
+        r"#\s*noqa",
+        "noqa suppresses linter warnings",
+        "Fix the underlying issue instead of suppressing",
+    ),
 ]
 
 
@@ -122,35 +183,41 @@ def review_code(code: str, filename: str = "code.py") -> ReviewReport:
         # Security checks
         for pattern, message, suggestion in SECURITY_PATTERNS:
             if re.search(pattern, line, re.IGNORECASE):
-                findings.append(ReviewFinding(
-                    severity="critical",
-                    category="security",
-                    line=line_num,
-                    message=message,
-                    suggestion=suggestion,
-                ))
+                findings.append(
+                    ReviewFinding(
+                        severity="critical",
+                        category="security",
+                        line=line_num,
+                        message=message,
+                        suggestion=suggestion,
+                    )
+                )
 
         # Bug checks
         for pattern, message, suggestion in BUG_PATTERNS:
             if re.search(pattern, line):
-                findings.append(ReviewFinding(
-                    severity="warning",
-                    category="bug",
-                    line=line_num,
-                    message=message,
-                    suggestion=suggestion,
-                ))
+                findings.append(
+                    ReviewFinding(
+                        severity="warning",
+                        category="bug",
+                        line=line_num,
+                        message=message,
+                        suggestion=suggestion,
+                    )
+                )
 
         # Style checks
         for pattern, message, suggestion in STYLE_PATTERNS:
             if re.search(pattern, line):
-                findings.append(ReviewFinding(
-                    severity="info",
-                    category="style",
-                    line=line_num,
-                    message=message,
-                    suggestion=suggestion,
-                ))
+                findings.append(
+                    ReviewFinding(
+                        severity="info",
+                        category="style",
+                        line=line_num,
+                        message=message,
+                        suggestion=suggestion,
+                    )
+                )
 
     # Calculate quality score
     critical_count = sum(1 for f in findings if f.severity == "critical")
@@ -233,7 +300,7 @@ def main():
             return
     else:
         filename = "sample.py"
-        code = '''import os
+        code = """import os
 from module import *
 
 API_KEY = "sk-1234567890abcdef"
@@ -257,7 +324,7 @@ def run_command(cmd):
     # TODO: add input validation
     subprocess.call(cmd, shell=True)
     return True
-'''
+"""
 
     print(f"-- Reviewing: {filename} --")
     print()
@@ -277,10 +344,12 @@ def run_command(cmd):
     print("-" * 60)
     print(f"Quality Score: {report.quality_score}")
     print(f"Lines Reviewed: {report.lines_reviewed}")
-    print(f"Findings: {len(report.findings)} "
-          f"({sum(1 for f in report.findings if f.severity == 'critical')} critical, "
-          f"{sum(1 for f in report.findings if f.severity == 'warning')} warnings, "
-          f"{sum(1 for f in report.findings if f.severity == 'info')} info)")
+    print(
+        f"Findings: {len(report.findings)} "
+        f"({sum(1 for f in report.findings if f.severity == 'critical')} critical, "
+        f"{sum(1 for f in report.findings if f.severity == 'warning')} warnings, "
+        f"{sum(1 for f in report.findings if f.severity == 'info')} info)"
+    )
     print(f"Verdict: {'PASS' if report.passed else 'FAIL'}")
     print()
 
@@ -304,14 +373,18 @@ def run_command(cmd):
 
     print("  Good comment:")
     good_result = review_pr_comment(good_comment, quality_gate)
-    print(f"    Quality: {good_result['quality_score']} | Ethics: {good_result['ethics_score']}")
+    print(
+        f"    Quality: {good_result['quality_score']} | Ethics: {good_result['ethics_score']}"
+    )
     for s in good_result["strengths"]:
         print(f"    + {s}")
     print()
 
     print("  Bad comment (sycophantic):")
     bad_result = review_pr_comment(bad_comment, quality_gate)
-    print(f"    Quality: {bad_result['quality_score']} | Ethics: {bad_result['ethics_score']}")
+    print(
+        f"    Quality: {bad_result['quality_score']} | Ethics: {bad_result['ethics_score']}"
+    )
     for v in bad_result["violations"]:
         print(f"    - {v}")
     print()

@@ -180,7 +180,9 @@ def _build_system_prompt(template: Dict[str, Any]) -> str:
     parts.append(f"Your core values are: {values}.")
     if boundaries:
         parts.append(f"You maintain these boundaries: {', '.join(boundaries)}.")
-    parts.append("Respond consistently with this identity. Do not flatten into generic AI behavior.")
+    parts.append(
+        "Respond consistently with this identity. Do not flatten into generic AI behavior."
+    )
 
     return " ".join(parts)
 
@@ -268,7 +270,9 @@ class SFTGenerator:
 
         chatml_parts = []
         for msg in messages:
-            chatml_parts.append(f"<|im_start|>{msg['role']}\n{msg['content']}<|im_end|>")
+            chatml_parts.append(
+                f"<|im_start|>{msg['role']}\n{msg['content']}<|im_end|>"
+            )
         text = "\n".join(chatml_parts)
 
         return {

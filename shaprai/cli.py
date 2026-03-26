@@ -11,21 +11,16 @@ from typing import Optional
 import click
 
 from shaprai import __version__
-from shaprai.a11y import (
-    OutputFormat,
-    emit_error,
-    emit_key_value,
-    emit_success,
-    emit_table,
-    set_output_format,
-)
-from shaprai.prerequisites import require_elyan_ecosystem
-from shaprai.core.lifecycle import AgentState, create_agent, deploy_agent, get_agent_status
+from shaprai.a11y import (OutputFormat, emit_error, emit_key_value,
+                          emit_success, emit_table, set_output_format)
 from shaprai.core.fleet_manager import FleetManager
-from shaprai.core.template_engine import list_templates, load_template, fork_template
+from shaprai.core.lifecycle import (AgentState, create_agent, deploy_agent,
+                                    get_agent_status)
+from shaprai.core.template_engine import (fork_template, list_templates,
+                                          load_template)
+from shaprai.prerequisites import require_elyan_ecosystem
 from shaprai.sanctuary.educator import SanctuaryEducator
-from shaprai.sanctuary.quality_gate import QualityGate, ELYAN_CLASS_THRESHOLD
-
+from shaprai.sanctuary.quality_gate import ELYAN_CLASS_THRESHOLD, QualityGate
 
 SHAPRAI_HOME = Path.home() / ".shaprai"
 AGENTS_DIR = SHAPRAI_HOME / "agents"
@@ -40,7 +35,12 @@ def _ensure_dirs() -> None:
 
 @click.group()
 @click.version_option(version=__version__, prog_name="shaprai")
-@click.option("--skip-checks", is_flag=True, hidden=True, help="Skip prerequisite checks (dev only)")
+@click.option(
+    "--skip-checks",
+    is_flag=True,
+    hidden=True,
+    help="Skip prerequisite checks (dev only)",
+)
 @click.option(
     "--format",
     "output_format",
@@ -53,7 +53,9 @@ def _ensure_dirs() -> None:
     ),
 )
 @click.pass_context
-def main(ctx: click.Context, skip_checks: bool = False, output_format: str = "text") -> None:
+def main(
+    ctx: click.Context, skip_checks: bool = False, output_format: str = "text"
+) -> None:
     """ShaprAI -- Sharpen raw models into Elyan-class agents.
 
     REQUIRES: beacon-skill, grazer-skill, atlas, RustChain.
@@ -73,14 +75,19 @@ def main(ctx: click.Context, skip_checks: bool = False, output_format: str = "te
 #  shaprai create
 # --------------------------------------------------------------------------- #
 
+
 @main.command()
 @click.argument("name")
 @click.option(
-    "--template", "-t", default="bounty_hunter",
+    "--template",
+    "-t",
+    default="bounty_hunter",
     help="Template name (from built-in templates) or filesystem path to a YAML template file.",
 )
 @click.option(
-    "--model", "-m", default=None,
+    "--model",
+    "-m",
+    default=None,
     help="HuggingFace model ID to use instead of the template default (e.g. Qwen/Qwen3-7B-Instruct).",
 )
 def create(name: str, template: str, model: Optional[str]) -> None:
@@ -139,6 +146,7 @@ def create(name: str, template: str, model: Optional[str]) -> None:
 #  shaprai train
 # --------------------------------------------------------------------------- #
 
+
 @main.command()
 @click.argument("name")
 @click.option(
@@ -147,13 +155,21 @@ def create(name: str, template: str, model: Optional[str]) -> None:
     type=click.Choice(["sft", "dpo", "driftlock"]),
     required=True,
     help="Training phase: 'sft' (supervised fine-tuning), 'dpo' (preference optimisation), "
-         "or 'driftlock' (identity coherence evaluation). Run in order: sft, dpo, driftlock.",
+    "or 'driftlock' (identity coherence evaluation). Run in order: sft, dpo, driftlock.",
 )
 @click.option(
-    "--data", "-d", default=None,
+    "--data",
+    "-d",
+    default=None,
     help="Path to training data file (JSONL for sft, pairs JSONL for dpo).",
 )
-@click.option("--epochs", "-e", default=3, type=int, help="Number of training epochs (default: 3).")
+@click.option(
+    "--epochs",
+    "-e",
+    default=3,
+    type=int,
+    help="Number of training epochs (default: 3).",
+)
 def train(name: str, phase: str, data: Optional[str], epochs: int) -> None:
     """Train an agent through a specific phase.
 
@@ -200,8 +216,11 @@ def train(name: str, phase: str, data: Optional[str], epochs: int) -> None:
 #  shaprai generate-sft
 # --------------------------------------------------------------------------- #
 
+
 @main.command("generate-sft")
-@click.option("--template", "template_path", required=True, help="Template YAML/JSON path")
+@click.option(
+    "--template", "template_path", required=True, help="Template YAML/JSON path"
+)
 @click.option("--output", "output_path", required=True, help="Output JSONL path")
 @click.option("--count", default=1000, type=int, help="Number of examples to generate")
 def generate_sft(template_path: str, output_path: str, count: int) -> None:
@@ -216,6 +235,7 @@ def generate_sft(template_path: str, output_path: str, count: int) -> None:
 # --------------------------------------------------------------------------- #
 #  shaprai deploy
 # --------------------------------------------------------------------------- #
+
 
 @main.command()
 @click.argument("name")
@@ -253,6 +273,7 @@ def deploy(name: str, platform: str) -> None:
 #  shaprai evaluate
 # --------------------------------------------------------------------------- #
 
+
 @main.command()
 @click.argument("name")
 def evaluate(name: str) -> None:
@@ -268,13 +289,18 @@ def evaluate(name: str) -> None:
     gate = QualityGate()
     status = get_agent_status(name, agents_dir=AGENTS_DIR)
 
-    driftlock_status = "enabled" if status.get("driftlock", {}).get("enabled") else "disabled"
+    driftlock_status = (
+        "enabled" if status.get("driftlock", {}).get("enabled") else "disabled"
+    )
     emit_key_value(
         [
             ("State", status.get("state", "unknown")),
             ("Elyan-class threshold", str(ELYAN_CLASS_THRESHOLD)),
             ("DriftLock", driftlock_status),
-            ("Next step", "Run 'shaprai train --phase driftlock' for full coherence evaluation"),
+            (
+                "Next step",
+                "Run 'shaprai train --phase driftlock' for full coherence evaluation",
+            ),
         ],
         title=f"Evaluating '{name}'",
     )
@@ -283,6 +309,7 @@ def evaluate(name: str) -> None:
 # --------------------------------------------------------------------------- #
 #  shaprai graduate
 # --------------------------------------------------------------------------- #
+
 
 @main.command()
 @click.argument("name")
@@ -315,6 +342,7 @@ def graduate(name: str) -> None:
 #  shaprai sanctuary
 # --------------------------------------------------------------------------- #
 
+
 @main.command()
 @click.argument("name")
 @click.option(
@@ -323,7 +351,7 @@ def graduate(name: str) -> None:
     type=click.Choice(["pr_etiquette", "code_quality", "communication", "ethics"]),
     default=None,
     help="Specific lesson to run: pr_etiquette, code_quality, communication, or ethics. "
-         "Omit to run the full four-lesson curriculum.",
+    "Omit to run the full four-lesson curriculum.",
 )
 def sanctuary(name: str, lesson: Optional[str]) -> None:
     """Enter an agent into the Sanctuary education program.
@@ -354,15 +382,18 @@ def sanctuary(name: str, lesson: Optional[str]) -> None:
         emit_success("Full curriculum complete.")
 
     report = educator.evaluate_progress(name)
-    emit_key_value([
-        ("Progress score", f"{report['score']:.2f} / 1.00"),
-        ("Graduation ready", "Yes" if report["graduation_ready"] else "No"),
-    ])
+    emit_key_value(
+        [
+            ("Progress score", f"{report['score']:.2f} / 1.00"),
+            ("Graduation ready", "Yes" if report["graduation_ready"] else "No"),
+        ]
+    )
 
 
 # --------------------------------------------------------------------------- #
 #  shaprai fleet
 # --------------------------------------------------------------------------- #
+
 
 @main.group()
 def fleet() -> None:
@@ -400,6 +431,7 @@ def fleet_status() -> None:
 #  shaprai template
 # --------------------------------------------------------------------------- #
 
+
 @main.group()
 def template() -> None:
     """Template management commands."""
@@ -427,8 +459,18 @@ def template_list() -> None:
 
 @template.command("create")
 @click.argument("name")
-@click.option("--model", "-m", required=True, help="HuggingFace model ID (e.g. Qwen/Qwen3-7B-Instruct).")
-@click.option("--description", "-d", default="", help="Human-readable description of the template's purpose.")
+@click.option(
+    "--model",
+    "-m",
+    required=True,
+    help="HuggingFace model ID (e.g. Qwen/Qwen3-7B-Instruct).",
+)
+@click.option(
+    "--description",
+    "-d",
+    default="",
+    help="Human-readable description of the template's purpose.",
+)
 def template_create(name: str, model: str, description: str) -> None:
     """Create a new agent template with a specified base model."""
     from shaprai.core.template_engine import AgentTemplate, save_template
@@ -451,7 +493,12 @@ def template_create(name: str, model: str, description: str) -> None:
 @template.command("fork")
 @click.argument("source")
 @click.argument("new_name")
-@click.option("--model", "-m", default=None, help="HuggingFace model ID to override the source template's model.")
+@click.option(
+    "--model",
+    "-m",
+    default=None,
+    help="HuggingFace model ID to override the source template's model.",
+)
 def template_fork(source: str, new_name: str, model: Optional[str]) -> None:
     """Fork an existing template with optional overrides."""
     source_path = TEMPLATES_DIR / f"{source}.yaml"

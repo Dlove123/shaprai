@@ -4,11 +4,9 @@
 
 import pytest
 
-from shaprai.integrations.elyan_ecosystem import (
-    AgentProfile,
-    EcosystemConfig,
-    ElyanEcosystem,
-)
+from shaprai.integrations.elyan_ecosystem import (AgentProfile,
+                                                  EcosystemConfig,
+                                                  ElyanEcosystem)
 
 
 @pytest.fixture

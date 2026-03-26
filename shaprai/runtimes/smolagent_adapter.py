@@ -76,8 +76,12 @@ class ShaprSmolagent:
                 system_prompt=self.system_prompt,
             )
 
-            logger.info("Built smolagent '%s' with model %s and %d tools",
-                         self.name, self.model_id, len(self.tools))
+            logger.info(
+                "Built smolagent '%s' with model %s and %d tools",
+                self.name,
+                self.model_id,
+                len(self.tools),
+            )
             return self._agent
 
         except ImportError:

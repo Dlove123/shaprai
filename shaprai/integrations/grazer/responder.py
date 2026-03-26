@@ -80,7 +80,9 @@ class GrazerResponder:
             GeneratedResponse if quality checks pass, None otherwise.
         """
         if not self._can_respond():
-            logger.info("Rate limit reached (%d/hr)", self.config.max_responses_per_hour)
+            logger.info(
+                "Rate limit reached (%d/hr)", self.config.max_responses_per_hour
+            )
             return None
 
         response_text = self._craft_response(post, agent_personality)
@@ -145,9 +147,7 @@ class GrazerResponder:
             response.engagement_result = result
             return result
 
-    def _craft_response(
-        self, post: DiscoveredPost, personality: Dict[str, str]
-    ) -> str:
+    def _craft_response(self, post: DiscoveredPost, personality: Dict[str, str]) -> str:
         """Craft a response based on post content and agent personality.
 
         In production this would call the LLM. For now, returns a

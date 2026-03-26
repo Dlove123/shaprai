@@ -13,16 +13,12 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from shaprai.integrations.grazer.discovery import (
-    DiscoveredPost,
-    DiscoveryConfig,
-    GrazerDiscovery,
-)
-from shaprai.integrations.grazer.responder import (
-    GeneratedResponse,
-    GrazerResponder,
-    ResponderConfig,
-)
+from shaprai.integrations.grazer.discovery import (DiscoveredPost,
+                                                   DiscoveryConfig,
+                                                   GrazerDiscovery)
+from shaprai.integrations.grazer.responder import (GeneratedResponse,
+                                                   GrazerResponder,
+                                                   ResponderConfig)
 
 logger = logging.getLogger(__name__)
 
@@ -40,10 +36,12 @@ class GrazerAgentConfig:
     min_words: int = 50
     max_words: int = 300
     grazer_url: str = "https://rustchain.org/grazer"
-    personality: Dict[str, str] = field(default_factory=lambda: {
-        "style": "analytical_helpful",
-        "voice": "Clear and technical. Adds value, never filler.",
-    })
+    personality: Dict[str, str] = field(
+        default_factory=lambda: {
+            "style": "analytical_helpful",
+            "voice": "Clear and technical. Adds value, never filler.",
+        }
+    )
 
     @classmethod
     def from_template(cls, template_data: Dict[str, Any]) -> "GrazerAgentConfig":

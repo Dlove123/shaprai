@@ -22,17 +22,12 @@ from pathlib import Path
 
 import pytest
 
-from shaprai.integrations.beacon_mesh import (
-    ENVELOPE_PROTOCOL_VERSION,
-    BeaconIdentity,
-    BeaconMeshNetwork,
-    MeshEnvelope,
-    MeshPeer,
-    UDPDiscoveryListener,
-    create_identity,
-    generate_reply,
-    _classify_message,
-)
+from shaprai.integrations.beacon_mesh import (ENVELOPE_PROTOCOL_VERSION,
+                                              BeaconIdentity,
+                                              BeaconMeshNetwork, MeshEnvelope,
+                                              MeshPeer, UDPDiscoveryListener,
+                                              _classify_message,
+                                              create_identity, generate_reply)
 
 # ─────────────────────────────────────────────────
 # Fixtures
@@ -91,7 +86,9 @@ def mesh_three_agents(mesh_with_agents: BeaconMeshNetwork) -> BeaconMeshNetwork:
 class TestBeaconIdentity:
     """Tests for Ed25519 identity creation and key operations."""
 
-    def test_create_identity_produces_valid_fields(self, alpha_identity: BeaconIdentity) -> None:
+    def test_create_identity_produces_valid_fields(
+        self, alpha_identity: BeaconIdentity
+    ) -> None:
         assert alpha_identity.beacon_id == "bcn_shaprai_alpha"
         assert alpha_identity.agent_name == "alpha"
         assert len(alpha_identity.public_key) == 64  # 32 bytes hex-encoded
@@ -105,7 +102,9 @@ class TestBeaconIdentity:
         assert alpha_identity.private_key != beta_identity.private_key
         assert alpha_identity.beacon_id != beta_identity.beacon_id
 
-    def test_sign_produces_nonempty_signature(self, alpha_identity: BeaconIdentity) -> None:
+    def test_sign_produces_nonempty_signature(
+        self, alpha_identity: BeaconIdentity
+    ) -> None:
         data = b"test message"
         sig = alpha_identity.sign(data)
         assert isinstance(sig, str)
@@ -121,7 +120,9 @@ class TestBeaconIdentity:
         sig = alpha_identity.sign(data)
         assert alpha_identity.verify(b"tampered content", sig) is False
 
-    def test_verify_rejects_empty_signature(self, alpha_identity: BeaconIdentity) -> None:
+    def test_verify_rejects_empty_signature(
+        self, alpha_identity: BeaconIdentity
+    ) -> None:
         assert alpha_identity.verify(b"data", "") is False
 
     def test_different_identity_cannot_verify(
@@ -182,7 +183,9 @@ class TestMeshEnvelope:
         assert env.signature != ""
         assert env.verify(alpha_identity) is True
 
-    def test_unsigned_envelope_fails_verify(self, alpha_identity: BeaconIdentity) -> None:
+    def test_unsigned_envelope_fails_verify(
+        self, alpha_identity: BeaconIdentity
+    ) -> None:
         env = MeshEnvelope(
             sender_id=alpha_identity.beacon_id,
             receiver_id="bcn_shaprai_beta",
@@ -190,7 +193,9 @@ class TestMeshEnvelope:
         )
         assert env.verify(alpha_identity) is False
 
-    def test_tampered_payload_fails_verify(self, alpha_identity: BeaconIdentity) -> None:
+    def test_tampered_payload_fails_verify(
+        self, alpha_identity: BeaconIdentity
+    ) -> None:
         env = MeshEnvelope(
             sender_id=alpha_identity.beacon_id,
             receiver_id="bcn_shaprai_beta",
@@ -265,7 +270,9 @@ class TestBeaconMeshNetwork:
         assert peer.personality_style == "analytical_precise"
         assert peer.agent_config.get("name") == "mesh_agent_alpha"
 
-    def test_create_duplicate_agent_raises(self, mesh_with_agents: BeaconMeshNetwork) -> None:
+    def test_create_duplicate_agent_raises(
+        self, mesh_with_agents: BeaconMeshNetwork
+    ) -> None:
         with pytest.raises(ValueError, match="already exists"):
             mesh_with_agents.create_agent("alpha")
 
@@ -299,7 +306,9 @@ class TestBeaconMeshNetwork:
         with pytest.raises(KeyError, match="not found"):
             mesh_with_agents.send_message("unknown", "beta", "Hello?")
 
-    def test_envelope_signature_verified(self, mesh_with_agents: BeaconMeshNetwork) -> None:
+    def test_envelope_signature_verified(
+        self, mesh_with_agents: BeaconMeshNetwork
+    ) -> None:
         env = mesh_with_agents.send_message("alpha", "beta", "Verify me")
         alpha_id = mesh_with_agents.get_peer("alpha").identity
         assert env.verify(alpha_id) is True
@@ -325,7 +334,9 @@ class TestBeaconMeshNetwork:
 class TestBidirectionalMessaging:
     """Prove bidirectional communication (A→B AND B→A)."""
 
-    def test_five_messages_each_direction(self, mesh_with_agents: BeaconMeshNetwork) -> None:
+    def test_five_messages_each_direction(
+        self, mesh_with_agents: BeaconMeshNetwork
+    ) -> None:
         """Send at least 5 signed envelopes in each direction."""
         a_to_b_messages = [
             "Alpha to Beta: status check",
@@ -363,12 +374,18 @@ class TestBidirectionalMessaging:
         beta_id = mesh_with_agents.get_peer("beta").identity
 
         for env in a_to_b_envelopes:
-            assert env.verify(alpha_id), f"Alpha envelope failed verification: {env.nonce}"
+            assert env.verify(
+                alpha_id
+            ), f"Alpha envelope failed verification: {env.nonce}"
 
         for env in b_to_a_envelopes:
-            assert env.verify(beta_id), f"Beta envelope failed verification: {env.nonce}"
+            assert env.verify(
+                beta_id
+            ), f"Beta envelope failed verification: {env.nonce}"
 
-    def test_alternating_conversation(self, mesh_with_agents: BeaconMeshNetwork) -> None:
+    def test_alternating_conversation(
+        self, mesh_with_agents: BeaconMeshNetwork
+    ) -> None:
         """Simulate a natural back-and-forth conversation."""
         conversation = [
             ("alpha", "beta", "Hey Beta, are you online?"),
@@ -499,11 +516,20 @@ class TestThreeAgentMesh:
     def test_all_personality_styles_loaded(
         self, mesh_three_agents: BeaconMeshNetwork
     ) -> None:
-        assert mesh_three_agents.get_peer("alpha").personality_style == "analytical_precise"
-        assert mesh_three_agents.get_peer("beta").personality_style == "warm_collaborative"
-        assert mesh_three_agents.get_peer("gamma").personality_style == "vigilant_thorough"
+        assert (
+            mesh_three_agents.get_peer("alpha").personality_style
+            == "analytical_precise"
+        )
+        assert (
+            mesh_three_agents.get_peer("beta").personality_style == "warm_collaborative"
+        )
+        assert (
+            mesh_three_agents.get_peer("gamma").personality_style == "vigilant_thorough"
+        )
 
-    def test_full_mesh_communication(self, mesh_three_agents: BeaconMeshNetwork) -> None:
+    def test_full_mesh_communication(
+        self, mesh_three_agents: BeaconMeshNetwork
+    ) -> None:
         """Every agent talks to every other agent (full mesh)."""
         agents = ["alpha", "beta", "gamma"]
         for sender in agents:
@@ -519,7 +545,9 @@ class TestThreeAgentMesh:
         # 3 agents × 2 targets each = 6 messages
         assert len(mesh_three_agents.envelope_log) == 6
 
-    def test_three_agent_reply_chain(self, mesh_three_agents: BeaconMeshNetwork) -> None:
+    def test_three_agent_reply_chain(
+        self, mesh_three_agents: BeaconMeshNetwork
+    ) -> None:
         """Alpha → Beta → Gamma → Alpha message chain with replies."""
         env1 = mesh_three_agents.send_message("alpha", "beta", "Hello Beta from Alpha")
         reply1 = mesh_three_agents.generate_reply("beta", env1)
@@ -527,7 +555,9 @@ class TestThreeAgentMesh:
         env2 = mesh_three_agents.send_message("beta", "gamma", "Hello Gamma from Beta")
         reply2 = mesh_three_agents.generate_reply("gamma", env2)
 
-        env3 = mesh_three_agents.send_message("gamma", "alpha", "Hello Alpha from Gamma")
+        env3 = mesh_three_agents.send_message(
+            "gamma", "alpha", "Hello Alpha from Gamma"
+        )
         reply3 = mesh_three_agents.generate_reply("alpha", env3)
 
         # All replies are personality-consistent
@@ -773,9 +803,13 @@ class TestFullMeshDemo:
         mesh = BeaconMeshNetwork()
 
         # Create 3 agents
-        alpha_id = mesh.create_agent("alpha", str(TEMPLATES_DIR / "mesh_agent_alpha.yaml"))
+        alpha_id = mesh.create_agent(
+            "alpha", str(TEMPLATES_DIR / "mesh_agent_alpha.yaml")
+        )
         beta_id = mesh.create_agent("beta", str(TEMPLATES_DIR / "mesh_agent_beta.yaml"))
-        gamma_id = mesh.create_agent("gamma", str(TEMPLATES_DIR / "mesh_agent_gamma.yaml"))
+        gamma_id = mesh.create_agent(
+            "gamma", str(TEMPLATES_DIR / "mesh_agent_gamma.yaml")
+        )
 
         assert len(mesh.peers) == 3
 

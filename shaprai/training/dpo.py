@@ -31,7 +31,7 @@ DEFAULT_DPO_CONFIG = {
     "batch_size": 2,
     "gradient_accumulation_steps": 8,
     "max_seq_length": 2048,
-    "beta": 0.1,          # DPO temperature parameter
+    "beta": 0.1,  # DPO temperature parameter
     "lora_r": 16,
     "lora_alpha": 32,
     "lora_dropout": 0.05,
@@ -226,8 +226,12 @@ class DPOTrainer:
             raise ValueError("No base model specified in agent manifest")
 
         dataset_path = self._prepare_pairs(pairs_path)
-        logger.info("Starting DPO training: model=%s, epochs=%d, beta=%.2f",
-                     model_id, epochs, self.config["beta"])
+        logger.info(
+            "Starting DPO training: model=%s, epochs=%d, beta=%.2f",
+            model_id,
+            epochs,
+            self.config["beta"],
+        )
 
         result = {
             "phase": "dpo",
@@ -251,7 +255,9 @@ class DPOTrainer:
         except ImportError as e:
             logger.warning("TRL not available: %s", e)
             result["status"] = "skipped"
-            result["reason"] = f"Missing dependency: {e}. Install with: pip install shaprai[training]"
+            result["reason"] = (
+                f"Missing dependency: {e}. Install with: pip install shaprai[training]"
+            )
             result["completed_at"] = time.time()
 
         # Record in manifest

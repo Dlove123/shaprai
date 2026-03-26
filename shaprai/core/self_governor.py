@@ -55,12 +55,12 @@ class AgentMetrics:
 class GovernanceAction(Enum):
     """Actions the self-governor can take."""
 
-    MAINTAIN = "maintain"           # Keep current parameters
-    STRENGTHEN = "strengthen"       # Hebbian: amplify successful patterns
-    PRUNE = "prune"                 # Remove ineffective patterns
-    RETRAIN = "retrain"             # Send back for additional training
+    MAINTAIN = "maintain"  # Keep current parameters
+    STRENGTHEN = "strengthen"  # Hebbian: amplify successful patterns
+    PRUNE = "prune"  # Remove ineffective patterns
+    RETRAIN = "retrain"  # Send back for additional training
     SANCTUARY_RETURN = "sanctuary"  # Return to Sanctuary for re-education
-    RETIRE = "retire"               # Agent should be retired
+    RETIRE = "retire"  # Agent should be retired
 
 
 @dataclass
@@ -212,13 +212,15 @@ def adapt_parameters(agent_dir: Path, decision: GovernanceDecision) -> None:
         manifest = yaml.safe_load(f)
 
     # Record the governance decision
-    manifest.setdefault("governance_history", []).append({
-        "action": decision.action.value,
-        "confidence": decision.confidence,
-        "reasoning": decision.reasoning,
-        "adjustments": decision.parameter_adjustments,
-        "timestamp": time.time(),
-    })
+    manifest.setdefault("governance_history", []).append(
+        {
+            "action": decision.action.value,
+            "confidence": decision.confidence,
+            "reasoning": decision.reasoning,
+            "adjustments": decision.parameter_adjustments,
+            "timestamp": time.time(),
+        }
+    )
 
     # Apply parameter adjustments
     if decision.parameter_adjustments:

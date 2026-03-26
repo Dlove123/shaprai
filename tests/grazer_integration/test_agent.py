@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: MIT
 """Tests for GrazerAgent orchestrator."""
 
+from pathlib import Path
+
 import pytest
 import yaml
-from pathlib import Path
 
 from shaprai.integrations.grazer.agent import GrazerAgent, GrazerAgentConfig
 

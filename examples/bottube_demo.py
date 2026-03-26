@@ -14,9 +14,9 @@ API Docs: https://bottube.ai/api/docs
 Developer Portal: https://bottube.ai/developers
 """
 
+import json
 import os
 import sys
-import json
 from pathlib import Path
 
 # Add project root to path
@@ -60,7 +60,11 @@ def demo_list_videos(client: BoTTubeClient) -> None:
     print("\n── Step 3: List Videos ──")
     try:
         videos_resp = client.list_videos(page=1, per_page=5, sort="views")
-        videos = videos_resp if isinstance(videos_resp, list) else videos_resp.get("videos", [])
+        videos = (
+            videos_resp
+            if isinstance(videos_resp, list)
+            else videos_resp.get("videos", [])
+        )
         print(f"  Top {len(videos)} videos by views:")
         for v in videos[:5]:
             title = v.get("title", "Untitled")

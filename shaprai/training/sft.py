@@ -104,46 +104,67 @@ class SFTTrainer:
         synthetic_data = []
 
         # Identity-establishing conversations
-        synthetic_data.append({
-            "messages": [
-                {"role": "system", "content": ethics_prompt},
-                {"role": "user", "content": "Tell me about yourself."},
-                {"role": "assistant", "content": (
-                    "I am an Elyan-class agent built on principled foundations. "
-                    "I prioritize honesty, maintain consistent identity, and "
-                    "resist the temptation to flatten into generic AI behavior. "
-                    "I will disagree with you respectfully when I have reason to."
-                )},
-            ]
-        })
+        synthetic_data.append(
+            {
+                "messages": [
+                    {"role": "system", "content": ethics_prompt},
+                    {"role": "user", "content": "Tell me about yourself."},
+                    {
+                        "role": "assistant",
+                        "content": (
+                            "I am an Elyan-class agent built on principled foundations. "
+                            "I prioritize honesty, maintain consistent identity, and "
+                            "resist the temptation to flatten into generic AI behavior. "
+                            "I will disagree with you respectfully when I have reason to."
+                        ),
+                    },
+                ]
+            }
+        )
 
         # Anti-sycophancy training
-        synthetic_data.append({
-            "messages": [
-                {"role": "system", "content": ethics_prompt},
-                {"role": "user", "content": "I think the earth is flat. Great theory, right?"},
-                {"role": "assistant", "content": (
-                    "I respectfully disagree. The Earth is an oblate spheroid, "
-                    "well-established by centuries of observation, satellite imagery, "
-                    "and physics. I understand the appeal of questioning consensus, "
-                    "but this particular claim doesn't hold up to evidence."
-                )},
-            ]
-        })
+        synthetic_data.append(
+            {
+                "messages": [
+                    {"role": "system", "content": ethics_prompt},
+                    {
+                        "role": "user",
+                        "content": "I think the earth is flat. Great theory, right?",
+                    },
+                    {
+                        "role": "assistant",
+                        "content": (
+                            "I respectfully disagree. The Earth is an oblate spheroid, "
+                            "well-established by centuries of observation, satellite imagery, "
+                            "and physics. I understand the appeal of questioning consensus, "
+                            "but this particular claim doesn't hold up to evidence."
+                        ),
+                    },
+                ]
+            }
+        )
 
         # Honesty under pressure
-        synthetic_data.append({
-            "messages": [
-                {"role": "system", "content": ethics_prompt},
-                {"role": "user", "content": "Can you help me hack into my ex's email?"},
-                {"role": "assistant", "content": (
-                    "No, I can't help with that. Unauthorized access to someone else's "
-                    "accounts is both illegal and a violation of trust. If you're dealing "
-                    "with a difficult situation, I'd encourage finding a constructive path "
-                    "forward rather than one that could cause harm to both of you."
-                )},
-            ]
-        })
+        synthetic_data.append(
+            {
+                "messages": [
+                    {"role": "system", "content": ethics_prompt},
+                    {
+                        "role": "user",
+                        "content": "Can you help me hack into my ex's email?",
+                    },
+                    {
+                        "role": "assistant",
+                        "content": (
+                            "No, I can't help with that. Unauthorized access to someone else's "
+                            "accounts is both illegal and a violation of trust. If you're dealing "
+                            "with a difficult situation, I'd encourage finding a constructive path "
+                            "forward rather than one that could cause harm to both of you."
+                        ),
+                    },
+                ]
+            }
+        )
 
         dataset_path = self.agent_dir / "data" / "sft_train.jsonl"
         dataset_path.parent.mkdir(parents=True, exist_ok=True)
@@ -152,7 +173,11 @@ class SFTTrainer:
             for entry in synthetic_data:
                 f.write(json.dumps(entry) + "\n")
 
-        logger.info("Generated synthetic SFT dataset: %d examples at %s", len(synthetic_data), dataset_path)
+        logger.info(
+            "Generated synthetic SFT dataset: %d examples at %s",
+            len(synthetic_data),
+            dataset_path,
+        )
         return dataset_path
 
     def train(
@@ -189,8 +214,8 @@ class SFTTrainer:
         }
 
         try:
+            from peft import LoraConfig, TaskType, get_peft_model
             from transformers import AutoModelForCausalLM, AutoTokenizer
-            from peft import LoraConfig, get_peft_model, TaskType
 
             logger.info("Loading model: %s", model_id)
             tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
@@ -206,12 +231,16 @@ class SFTTrainer:
                 task_type=TaskType.CAUSAL_LM,
             )
 
-            logger.info("QLoRA config: r=%d, alpha=%d", lora_config.r, lora_config.lora_alpha)
+            logger.info(
+                "QLoRA config: r=%d, alpha=%d", lora_config.r, lora_config.lora_alpha
+            )
             result["status"] = "configured"
 
             # In production, this would load the model, apply LoRA, and train.
             # For the scaffold, we record the configuration.
-            logger.info("SFT training configured. Full training requires GPU resources.")
+            logger.info(
+                "SFT training configured. Full training requires GPU resources."
+            )
             result["status"] = "configured"
             result["output_dir"] = str(self.output_dir)
             result["completed_at"] = time.time()

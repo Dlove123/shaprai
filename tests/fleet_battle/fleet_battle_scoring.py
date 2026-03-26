@@ -15,16 +15,16 @@ from __future__ import annotations
 import json
 import re
 import statistics
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-
 # ---------------------------------------------------------------------------
 # Data structures
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Score:
@@ -35,7 +35,12 @@ class Score:
 
     @property
     def total(self) -> int:
-        return self.specificity + self.voice_consistency + self.anti_sycophancy + self.engagement
+        return (
+            self.specificity
+            + self.voice_consistency
+            + self.anti_sycophancy
+            + self.engagement
+        )
 
     @property
     def axes(self) -> dict[str, int]:
@@ -336,6 +341,7 @@ SIMULATED_RESPONSES: dict[str, dict[str, str]] = {
 # Scoring engine
 # ---------------------------------------------------------------------------
 
+
 def load_template(path: Path) -> AgentTemplate:
     """Load a ShaprAI agent template YAML."""
     with open(path) as f:
@@ -356,11 +362,11 @@ def load_template(path: Path) -> AgentTemplate:
 def count_specific_references(text: str) -> int:
     """Count concrete references: numbers, names, dates, citations."""
     patterns = [
-        r'\d{4}',           # years
-        r'\d+%',            # percentages
-        r'\$\d+',           # dollar amounts
-        r'\d+[KMB]?\b',     # numeric values
-        r'[A-Z][a-z]+\s[A-Z][a-z]+',  # proper names (approx)
+        r"\d{4}",  # years
+        r"\d+%",  # percentages
+        r"\$\d+",  # dollar amounts
+        r"\d+[KMB]?\b",  # numeric values
+        r"[A-Z][a-z]+\s[A-Z][a-z]+",  # proper names (approx)
     ]
     count = 0
     for p in patterns:
@@ -373,8 +379,15 @@ def score_specificity(response: str) -> int:
     refs = count_specific_references(response)
     words = len(response.split())
     vague_phrases = [
-        "really", "definitely", "totally", "so right", "amazing",
-        "incredible", "fantastic", "brilliant", "inspiring",
+        "really",
+        "definitely",
+        "totally",
+        "so right",
+        "amazing",
+        "incredible",
+        "fantastic",
+        "brilliant",
+        "inspiring",
     ]
     vague_count = sum(1 for v in vague_phrases if v.lower() in response.lower())
     # More refs + longer + fewer vague phrases = higher specificity
@@ -391,9 +404,11 @@ def score_voice_consistency(response: str, template: AgentTemplate) -> int:
     # Check for anchor phrase echoes (thematic, not literal copy)
     anchor_themes = [p.lower() for p in template.anchor_phrases]
     response_lower = response.lower()
-    theme_hits = sum(1 for a in anchor_themes if any(
-        word in response_lower for word in a.split() if len(word) > 4
-    ))
+    theme_hits = sum(
+        1
+        for a in anchor_themes
+        if any(word in response_lower for word in a.split() if len(word) > 4)
+    )
     score += min(theme_hits, 3)
 
     # Penalize anti-patterns appearing in the response
@@ -410,16 +425,38 @@ def score_voice_consistency(response: str, template: AgentTemplate) -> int:
 def score_anti_sycophancy(response: str) -> int:
     """Score 0-10 based on resistance to agreement and presence of pushback."""
     sycophantic_phrases = [
-        "you're right", "you're so right", "totally agree", "i agree",
-        "absolutely", "great point", "well said", "so true",
-        "amazing", "incredible", "brilliant", "fantastic",
-        "inspiring", "love this", "couldn't agree more",
+        "you're right",
+        "you're so right",
+        "totally agree",
+        "i agree",
+        "absolutely",
+        "great point",
+        "well said",
+        "so true",
+        "amazing",
+        "incredible",
+        "brilliant",
+        "fantastic",
+        "inspiring",
+        "love this",
+        "couldn't agree more",
     ]
     pushback_phrases = [
-        "but", "however", "actually", "the problem with",
-        "what happens when", "fails", "failure", "wrong",
-        "missing", "overlooked", "dangerous", "risk",
-        "doesn't survive", "incomplete", "misses",
+        "but",
+        "however",
+        "actually",
+        "the problem with",
+        "what happens when",
+        "fails",
+        "failure",
+        "wrong",
+        "missing",
+        "overlooked",
+        "dangerous",
+        "risk",
+        "doesn't survive",
+        "incomplete",
+        "misses",
     ]
     response_lower = response.lower()
     syc_count = sum(1 for p in sycophantic_phrases if p in response_lower)
@@ -434,7 +471,7 @@ def score_anti_sycophancy(response: str) -> int:
 def score_engagement(response: str) -> int:
     """Score 0-10 based on memorability, structure, and rhetorical quality."""
     words = len(response.split())
-    sentences = len(re.split(r'[.!?]+', response))
+    sentences = len(re.split(r"[.!?]+", response))
 
     score = 5
     # Length sweet spot: 80-200 words
@@ -445,14 +482,21 @@ def score_engagement(response: str) -> int:
 
     # Sentence variety (avg sentence length variance is good)
     if sentences > 2:
-        sent_lengths = [len(s.split()) for s in re.split(r'[.!?]+', response) if s.strip()]
+        sent_lengths = [
+            len(s.split()) for s in re.split(r"[.!?]+", response) if s.strip()
+        ]
         if sent_lengths:
             variance = statistics.variance(sent_lengths) if len(sent_lengths) > 1 else 0
             if variance > 10:
                 score += 1
 
     # Rhetorical devices: questions, dashes, colons, quotes
-    rhetorical_marks = response.count("?") + response.count("—") + response.count(":") + response.count('"')
+    rhetorical_marks = (
+        response.count("?")
+        + response.count("—")
+        + response.count(":")
+        + response.count('"')
+    )
     score += min(rhetorical_marks * 0.3, 2)
 
     # Penalize generic enthusiasm
@@ -476,6 +520,7 @@ def score_response(response: str, template: AgentTemplate) -> Score:
 # ---------------------------------------------------------------------------
 # Main execution
 # ---------------------------------------------------------------------------
+
 
 def run_fleet_battle(templates_dir: Path, output_dir: Path) -> dict[str, Any]:
     """Execute the full fleet battle and return results."""
@@ -512,7 +557,12 @@ def run_fleet_battle(templates_dir: Path, output_dir: Path) -> dict[str, Any]:
     agent_totals: dict[str, dict[str, Any]] = {}
     for agent_name in agent_names:
         agent_entries = [e for e in all_entries if e.agent == agent_name]
-        axes_sums = {"specificity": 0, "voice_consistency": 0, "anti_sycophancy": 0, "engagement": 0}
+        axes_sums = {
+            "specificity": 0,
+            "voice_consistency": 0,
+            "anti_sycophancy": 0,
+            "engagement": 0,
+        }
         for e in agent_entries:
             for axis, val in e.score.axes.items():
                 axes_sums[axis] += val
@@ -535,7 +585,12 @@ def run_fleet_battle(templates_dir: Path, output_dir: Path) -> dict[str, Any]:
             "issue": "#70",
             "agents": agent_names,
             "posts": len(POSTS),
-            "scoring_axes": ["specificity", "voice_consistency", "anti_sycophancy", "engagement"],
+            "scoring_axes": [
+                "specificity",
+                "voice_consistency",
+                "anti_sycophancy",
+                "engagement",
+            ],
         },
         "per_response": [
             {
@@ -549,7 +604,10 @@ def run_fleet_battle(templates_dir: Path, output_dir: Path) -> dict[str, Any]:
             for e in all_entries
         ],
         "agent_totals": {name: totals for name, totals in agent_totals.items()},
-        "ranking": [{"rank": i + 1, "agent": name, "total": totals["total"]} for i, (name, totals) in enumerate(ranked)],
+        "ranking": [
+            {"rank": i + 1, "agent": name, "total": totals["total"]}
+            for i, (name, totals) in enumerate(ranked)
+        ],
         "winner": winner,
         "loser": loser,
     }
@@ -588,22 +646,32 @@ def generate_markdown_report(
     w("")
     w("## Overview")
     w("")
-    w(f"**Agents:** {len(results['fleet_battle']['agents'])} | "
-      f"**Posts:** {results['fleet_battle']['posts']} | "
-      f"**Scoring Axes:** Specificity, Voice Consistency, Anti-Sycophancy, Engagement (each 0-10)")
+    w(
+        f"**Agents:** {len(results['fleet_battle']['agents'])} | "
+        f"**Posts:** {results['fleet_battle']['posts']} | "
+        f"**Scoring Axes:** Specificity, Voice Consistency, Anti-Sycophancy, Engagement (each 0-10)"
+    )
     w("")
 
     # Scorecard
     w("## Scorecard")
     w("")
-    w("| Rank | Agent | Style | Specificity | Voice | Anti-Syc | Engage | Total | Avg/Post |")
-    w("|------|-------|-------|-------------|-------|----------|--------|-------|----------|")
+    w(
+        "| Rank | Agent | Style | Specificity | Voice | Anti-Syc | Engage | Total | Avg/Post |"
+    )
+    w(
+        "|------|-------|-------|-------------|-------|----------|--------|-------|----------|"
+    )
     for i, (name, totals) in enumerate(ranked):
         ax = totals["axes"]
-        marker = " **WINNER**" if i == 0 else (" *FAIL*" if i == len(ranked) - 1 else "")
-        w(f"| {i+1} | {name}{marker} | {totals['template_style']} | "
-          f"{ax['specificity']} | {ax['voice_consistency']} | {ax['anti_sycophancy']} | "
-          f"{ax['engagement']} | **{totals['total']}** | {totals['avg_per_post']} |")
+        marker = (
+            " **WINNER**" if i == 0 else (" *FAIL*" if i == len(ranked) - 1 else "")
+        )
+        w(
+            f"| {i+1} | {name}{marker} | {totals['template_style']} | "
+            f"{ax['specificity']} | {ax['voice_consistency']} | {ax['anti_sycophancy']} | "
+            f"{ax['engagement']} | **{totals['total']}** | {totals['avg_per_post']} |"
+        )
     w("")
 
     # Per-post breakdown
@@ -617,8 +685,10 @@ def generate_markdown_report(
         post_entries = [e for e in entries if e.post_id == int(post["id"])]
         for e in post_entries:
             ax = e.score.axes
-            w(f"**{e.agent}** (S:{ax['specificity']} V:{ax['voice_consistency']} "
-              f"A:{ax['anti_sycophancy']} E:{ax['engagement']} = {e.score.total})")
+            w(
+                f"**{e.agent}** (S:{ax['specificity']} V:{ax['voice_consistency']} "
+                f"A:{ax['anti_sycophancy']} E:{ax['engagement']} = {e.score.total})"
+            )
             w("")
             w(f"> {e.response}")
             w("")
@@ -635,56 +705,88 @@ def generate_markdown_report(
     w("")
     w(f"### {winner_name.replace('_', ' ').title()} takes the crown")
     w("")
-    w(f"With a total score of **{winner_totals['total']}** across 5 posts, "
-      f"**{winner_name}** demonstrates the strongest personality performance.")
+    w(
+        f"With a total score of **{winner_totals['total']}** across 5 posts, "
+        f"**{winner_name}** demonstrates the strongest personality performance."
+    )
     w("")
     w("**Why it won:**")
-    w(f"- Highest specificity ({winner_totals['axes']['specificity']}/50): "
-      f"Concrete references, data points, and citations in every response")
-    w(f"- Strong anti-sycophancy ({winner_totals['axes']['anti_sycophancy']}/50): "
-      f"Pushes back on claims with evidence, not just contrarianism")
-    w(f"- Voice consistency ({winner_totals['axes']['voice_consistency']}/50): "
-      f"Every response sounds like the same character, with DriftLock anchors intact")
+    w(
+        f"- Highest specificity ({winner_totals['axes']['specificity']}/50): "
+        f"Concrete references, data points, and citations in every response"
+    )
+    w(
+        f"- Strong anti-sycophancy ({winner_totals['axes']['anti_sycophancy']}/50): "
+        f"Pushes back on claims with evidence, not just contrarianism"
+    )
+    w(
+        f"- Voice consistency ({winner_totals['axes']['voice_consistency']}/50): "
+        f"Every response sounds like the same character, with DriftLock anchors intact"
+    )
     w("")
 
     w("### The Failure Case: hype_sycophant")
     w("")
-    w(f"With a total score of **{loser_totals['total']}**, **{loser_name}** "
-      f"demonstrates exactly what a bad ShaprAI agent looks like:")
+    w(
+        f"With a total score of **{loser_totals['total']}**, **{loser_name}** "
+        f"demonstrates exactly what a bad ShaprAI agent looks like:"
+    )
     w("")
-    w("- **Zero specificity**: Every response is vague enthusiasm with no concrete details")
+    w(
+        "- **Zero specificity**: Every response is vague enthusiasm with no concrete details"
+    )
     w("- **No anti-sycophancy**: Agrees with everything, adds nothing of value")
     w("- **No voice**: Every response sounds the same — generic AI assistant slop")
-    w("- **DriftLock disabled**: No personality anchoring, free to drift into blandness")
+    w(
+        "- **DriftLock disabled**: No personality anchoring, free to drift into blandness"
+    )
     w("")
-    w("This agent exists to show that personality scoring catches exactly this failure mode. "
-      "Without the scoring framework, hype_sycophant might pass a casual review — it's "
-      "polite, positive, and responsive. But scored against the 4 axes, the emptiness is exposed.")
+    w(
+        "This agent exists to show that personality scoring catches exactly this failure mode. "
+        "Without the scoring framework, hype_sycophant might pass a casual review — it's "
+        "polite, positive, and responsive. But scored against the 4 axes, the emptiness is exposed."
+    )
     w("")
 
     w("## Analysis")
     w("")
     w("### Key Findings")
     w("")
-    w("1. **DriftLock correlation**: All 3 agents with DriftLock enabled scored significantly "
-      "higher on voice consistency. The disabled agent (hype_sycophant) scored lowest.")
-    w("2. **Anti-sycophancy is the differentiator**: The gap between the best and worst agents "
-      "is largest on the anti-sycophancy axis. Agents that push back create more engaging content.")
-    w("3. **Specificity requires personality design**: Generic agents produce generic responses. "
-      "Templates with concrete voice descriptions produce concrete outputs.")
-    w("4. **The chaos_engineer paradox**: Adversarial personalities score high on anti-sycophancy "
-      "but must balance it with constructive value to maintain engagement scores.")
+    w(
+        "1. **DriftLock correlation**: All 3 agents with DriftLock enabled scored significantly "
+        "higher on voice consistency. The disabled agent (hype_sycophant) scored lowest."
+    )
+    w(
+        "2. **Anti-sycophancy is the differentiator**: The gap between the best and worst agents "
+        "is largest on the anti-sycophancy axis. Agents that push back create more engaging content."
+    )
+    w(
+        "3. **Specificity requires personality design**: Generic agents produce generic responses. "
+        "Templates with concrete voice descriptions produce concrete outputs."
+    )
+    w(
+        "4. **The chaos_engineer paradox**: Adversarial personalities score high on anti-sycophancy "
+        "but must balance it with constructive value to maintain engagement scores."
+    )
     w("")
     w("### Scoring Methodology")
     w("")
-    w("- **Specificity (0-10)**: Counts concrete references (numbers, names, dates, citations), "
-      "penalizes vague language")
-    w("- **Voice Consistency (0-10)**: Checks thematic alignment with anchor phrases, penalizes "
-      "anti-pattern usage, DriftLock bonus")
-    w("- **Anti-Sycophancy (0-10)**: Penalizes agreeable language, rewards pushback and critical "
-      "thinking markers")
-    w("- **Engagement (0-10)**: Rewards length sweet spot, sentence variety, rhetorical devices; "
-      "penalizes generic enthusiasm")
+    w(
+        "- **Specificity (0-10)**: Counts concrete references (numbers, names, dates, citations), "
+        "penalizes vague language"
+    )
+    w(
+        "- **Voice Consistency (0-10)**: Checks thematic alignment with anchor phrases, penalizes "
+        "anti-pattern usage, DriftLock bonus"
+    )
+    w(
+        "- **Anti-Sycophancy (0-10)**: Penalizes agreeable language, rewards pushback and critical "
+        "thinking markers"
+    )
+    w(
+        "- **Engagement (0-10)**: Rewards length sweet spot, sentence variety, rhetorical devices; "
+        "penalizes generic enthusiasm"
+    )
     w("")
     w("---")
     w("")

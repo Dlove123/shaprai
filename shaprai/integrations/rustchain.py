@@ -21,9 +21,9 @@ logger = logging.getLogger(__name__)
 RUSTCHAIN_DEFAULT_URL = "https://50.28.86.131"
 
 # Fee schedule (in RTC)
-SANCTUARY_FEE = 0.01        # Fee to enter the Sanctuary
-GRADUATION_FEE = 0.05       # Fee to graduate (certification cost)
-JOB_POSTING_FEE = 0.001     # Fee to post a job
+SANCTUARY_FEE = 0.01  # Fee to enter the Sanctuary
+GRADUATION_FEE = 0.05  # Fee to graduate (certification cost)
+JOB_POSTING_FEE = 0.001  # Fee to post a job
 
 
 def create_agent_wallet(
@@ -63,7 +63,9 @@ def create_agent_wallet(
             return None
 
     except ImportError:
-        logger.warning("requests not installed -- returning wallet ID without registration")
+        logger.warning(
+            "requests not installed -- returning wallet ID without registration"
+        )
         return wallet_id
     except Exception as e:
         logger.error("Wallet creation failed: %s", e)

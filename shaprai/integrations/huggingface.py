@@ -20,22 +20,54 @@ DEFAULT_CACHE_DIR = Path.home() / ".shaprai" / "models"
 # Recommended models for Elyan-class agents by size tier
 RECOMMENDED_MODELS = {
     "tiny": [
-        {"id": "Qwen/Qwen3-0.6B-Instruct", "vram_gb": 1, "description": "Tiny agent, edge deployment"},
+        {
+            "id": "Qwen/Qwen3-0.6B-Instruct",
+            "vram_gb": 1,
+            "description": "Tiny agent, edge deployment",
+        },
     ],
     "small": [
-        {"id": "Qwen/Qwen3-1.7B-Instruct", "vram_gb": 2, "description": "Small agent, fast inference"},
-        {"id": "HuggingFaceTB/SmolLM2-1.7B-Instruct", "vram_gb": 2, "description": "Efficient small model"},
+        {
+            "id": "Qwen/Qwen3-1.7B-Instruct",
+            "vram_gb": 2,
+            "description": "Small agent, fast inference",
+        },
+        {
+            "id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+            "vram_gb": 2,
+            "description": "Efficient small model",
+        },
     ],
     "medium": [
-        {"id": "Qwen/Qwen3-7B-Instruct", "vram_gb": 6, "description": "Standard Elyan-class agent"},
-        {"id": "mistralai/Mistral-7B-Instruct-v0.3", "vram_gb": 6, "description": "Strong reasoning"},
+        {
+            "id": "Qwen/Qwen3-7B-Instruct",
+            "vram_gb": 6,
+            "description": "Standard Elyan-class agent",
+        },
+        {
+            "id": "mistralai/Mistral-7B-Instruct-v0.3",
+            "vram_gb": 6,
+            "description": "Strong reasoning",
+        },
     ],
     "large": [
-        {"id": "Qwen/Qwen3-14B-Instruct", "vram_gb": 10, "description": "Enhanced capabilities"},
-        {"id": "mistralai/Mixtral-8x7B-Instruct-v0.1", "vram_gb": 24, "description": "MoE, broad knowledge"},
+        {
+            "id": "Qwen/Qwen3-14B-Instruct",
+            "vram_gb": 10,
+            "description": "Enhanced capabilities",
+        },
+        {
+            "id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+            "vram_gb": 24,
+            "description": "MoE, broad knowledge",
+        },
     ],
     "xl": [
-        {"id": "Qwen/Qwen3-32B-Instruct", "vram_gb": 20, "description": "Near-frontier performance"},
+        {
+            "id": "Qwen/Qwen3-32B-Instruct",
+            "vram_gb": 20,
+            "description": "Near-frontier performance",
+        },
     ],
 }
 
@@ -74,8 +106,8 @@ def load_base_model(
 
         if quantize:
             try:
-                from transformers import BitsAndBytesConfig
                 import torch
+                from transformers import BitsAndBytesConfig
 
                 bnb_config = BitsAndBytesConfig(
                     load_in_4bit=True,
@@ -86,7 +118,9 @@ def load_base_model(
                 load_kwargs["quantization_config"] = bnb_config
                 load_kwargs["device_map"] = "auto"
             except ImportError:
-                logger.warning("bitsandbytes not available -- loading without quantization")
+                logger.warning(
+                    "bitsandbytes not available -- loading without quantization"
+                )
 
         model = AutoModelForCausalLM.from_pretrained(model_id, **load_kwargs)
         logger.info("Model loaded successfully: %s", model_id)
@@ -139,7 +173,11 @@ def list_compatible_models(
     """
     results: List[Dict[str, Any]] = []
 
-    tiers = [size_filter] if size_filter and size_filter in RECOMMENDED_MODELS else RECOMMENDED_MODELS.keys()
+    tiers = (
+        [size_filter]
+        if size_filter and size_filter in RECOMMENDED_MODELS
+        else RECOMMENDED_MODELS.keys()
+    )
 
     for tier in tiers:
         for model in RECOMMENDED_MODELS.get(tier, []):

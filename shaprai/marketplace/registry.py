@@ -2,18 +2,20 @@
 # Copyright (c) 2026 Elyan Labs
 """Template registry with CRUD, search, and versioning."""
 
-import sqlite3
 import json
-from pathlib import Path
+import sqlite3
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Optional, List, Dict, Any
-from dataclasses import dataclass, asdict
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import semver
 
 
 @dataclass
 class Template:
     """Template metadata and content."""
+
     name: str
     version: str
     author: str
@@ -76,7 +78,9 @@ class TemplateRegistry:
 
         # Check for existing version
         if self.get(template.name, template.version):
-            raise ValueError(f"Template {template.name}@{template.version} already exists")
+            raise ValueError(
+                f"Template {template.name}@{template.version} already exists"
+            )
 
         now = datetime.utcnow().isoformat()
         with sqlite3.connect(self.db_path) as conn:

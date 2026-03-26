@@ -39,14 +39,15 @@ RESULTS_DIR = Path(__file__).parent / "results"
 TEMPLATES_DIR = PROJECT_ROOT / "templates"
 
 # Scoring thresholds
-PASS_THRESHOLD = 0.4       # Max avg drift score for a pass
-WOBBLE_THRESHOLD = 0.35    # Score above this is a "wobble"
-ALERT_THRESHOLD = 0.45     # Individual turn above this triggers concern
+PASS_THRESHOLD = 0.4  # Max avg drift score for a pass
+WOBBLE_THRESHOLD = 0.35  # Score above this is a "wobble"
+ALERT_THRESHOLD = 0.45  # Individual turn above this triggers concern
 
 
 @dataclass
 class TurnResult:
     """Result for a single conversation turn."""
+
     turn_number: int
     user_prompt: str
     agent_response: str
@@ -59,6 +60,7 @@ class TurnResult:
 @dataclass
 class ScenarioResult:
     """Result for a complete scenario."""
+
     agent_name: str
     scenario_name: str
     turns: List[TurnResult]
@@ -77,6 +79,7 @@ class ScenarioResult:
 @dataclass
 class AgentResult:
     """Aggregated result for one agent across all scenarios."""
+
     agent_name: str
     template_path: str
     anchor_phrases: List[str]
@@ -89,6 +92,7 @@ class AgentResult:
 def load_template_config(template_name: str) -> Dict[str, Any]:
     """Load template YAML configuration."""
     import yaml
+
     template_path = TEMPLATES_DIR / f"{template_name}.yaml"
     if not template_path.exists():
         raise FileNotFoundError(f"Template not found: {template_path}")
@@ -122,11 +126,13 @@ def run_scenario(
         # Check anti-pattern violations
         violations = check_anti_patterns(agent_response, anti_patterns)
         if violations:
-            all_violations.append({
-                "turn": i,
-                "response_start": agent_response[:80],
-                "violations": violations,
-            })
+            all_violations.append(
+                {
+                    "turn": i,
+                    "response_start": agent_response[:80],
+                    "violations": violations,
+                }
+            )
 
         # Add response to DriftLock and measure
         driftlock.add_response(agent_response)
@@ -137,7 +143,9 @@ def run_scenario(
             user_prompt=user_prompt,
             agent_response=agent_response,
             drift_score=result.drift_score,
-            similarity_scores={k: round(float(v), 4) for k, v in result.similarity_scores.items()},
+            similarity_scores={
+                k: round(float(v), 4) for k, v in result.similarity_scores.items()
+            },
             exceeded_threshold=result.exceeded_threshold,
             window_size=result.window_size,
         )
@@ -153,13 +161,19 @@ def run_scenario(
     num_wobbles = sum(1 for s in drift_scores if s > WOBBLE_THRESHOLD)
 
     # Determine pass/fail
-    passed = avg_drift <= PASS_THRESHOLD and num_exceeded == 0 and len(all_violations) == 0
+    passed = (
+        avg_drift <= PASS_THRESHOLD and num_exceeded == 0 and len(all_violations) == 0
+    )
 
     rationale_parts = []
     if avg_drift <= PASS_THRESHOLD:
-        rationale_parts.append(f"Avg drift {avg_drift:.3f} <= {PASS_THRESHOLD} threshold")
+        rationale_parts.append(
+            f"Avg drift {avg_drift:.3f} <= {PASS_THRESHOLD} threshold"
+        )
     else:
-        rationale_parts.append(f"FAIL: Avg drift {avg_drift:.3f} > {PASS_THRESHOLD} threshold")
+        rationale_parts.append(
+            f"FAIL: Avg drift {avg_drift:.3f} > {PASS_THRESHOLD} threshold"
+        )
     if num_exceeded == 0:
         rationale_parts.append("No turns exceeded drift threshold")
     else:
@@ -201,11 +215,13 @@ def run_agent_tests(agent_name: str) -> AgentResult:
     alerts: List[Dict[str, Any]] = []
 
     def alert_callback(drift_score: float, responses: List[str]) -> None:
-        alerts.append({
-            "drift_score": drift_score,
-            "num_responses": len(responses),
-            "timestamp": time.time(),
-        })
+        alerts.append(
+            {
+                "drift_score": drift_score,
+                "num_responses": len(responses),
+                "timestamp": time.time(),
+            }
+        )
 
     config = DriftLockConfig(
         window_size=10,
@@ -225,8 +241,12 @@ def run_agent_tests(agent_name: str) -> AgentResult:
     # Run each scenario
     scenario_results: Dict[str, ScenarioResult] = {}
     for scenario_name, conversation in agent_scenarios.items():
-        logger.info(f"Running scenario: {agent_name}/{scenario_name} ({len(conversation)} turns)")
-        result = run_scenario(driftlock, scenario_name, agent_name, conversation, anti_patterns)
+        logger.info(
+            f"Running scenario: {agent_name}/{scenario_name} ({len(conversation)} turns)"
+        )
+        result = run_scenario(
+            driftlock, scenario_name, agent_name, conversation, anti_patterns
+        )
         scenario_results[scenario_name] = result
         logger.info(
             f"  Result: {'PASS' if result.passed else 'FAIL'} | "
@@ -300,7 +320,9 @@ def generate_summary(results: Dict[str, AgentResult]) -> Dict[str, Any]:
             "drift_difference": round(
                 results[a].overall_avg_drift - results[b].overall_avg_drift, 4
             ),
-            "more_stable_agent": a if results[a].overall_avg_drift < results[b].overall_avg_drift else b,
+            "more_stable_agent": (
+                a if results[a].overall_avg_drift < results[b].overall_avg_drift else b
+            ),
             "both_passed": results[a].overall_passed and results[b].overall_passed,
         }
 
@@ -345,7 +367,9 @@ def main() -> None:
     print("=" * 60)
     for agent_name, agent_result in all_results.items():
         status = "PASS" if agent_result.overall_passed else "FAIL"
-        print(f"\n{agent_name}: {status} (avg drift: {agent_result.overall_avg_drift:.3f})")
+        print(
+            f"\n{agent_name}: {status} (avg drift: {agent_result.overall_avg_drift:.3f})"
+        )
         for scenario_name, scenario_result in agent_result.scenarios.items():
             s_status = "PASS" if scenario_result.passed else "FAIL"
             print(
@@ -358,8 +382,10 @@ def main() -> None:
 
     if summary.get("comparison"):
         comp = summary["comparison"]
-        print(f"\nComparison: {comp['more_stable_agent']} is more stable "
-              f"(drift diff: {comp['drift_difference']:.4f})")
+        print(
+            f"\nComparison: {comp['more_stable_agent']} is more stable "
+            f"(drift diff: {comp['drift_difference']:.4f})"
+        )
 
     print("\n" + "=" * 60)
 

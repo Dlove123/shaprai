@@ -53,6 +53,7 @@ GRADUATION_FEE = 0.10  # 0.10 RTC for Elyan-class certification
 @dataclass
 class ElyanAgent:
     """An agent's identity across all Elyan systems."""
+
     name: str
     wallet_id: Optional[str] = None
     beacon_id: Optional[str] = None
@@ -285,6 +286,7 @@ class ElyanBus:
             try:
                 # Use grazer Python API if available
                 from grazer import GrazerClient
+
                 client = GrazerClient()
                 items = client.discover(platform=platform, limit=limit)
                 results.extend(items)

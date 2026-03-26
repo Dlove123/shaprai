@@ -32,7 +32,7 @@ import socket
 import struct
 import threading
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -325,7 +325,9 @@ def _classify_message(payload: str) -> str:
     lower = payload.lower().strip()
     if any(g in lower for g in ("hello", "hey", "hi ", "greetings", "good morning")):
         return "greeting"
-    if any(c in lower for c in ("collaborate", "together", "let's", "coordinate", "team")):
+    if any(
+        c in lower for c in ("collaborate", "together", "let's", "coordinate", "team")
+    ):
         return "collaboration"
     if any(s in lower for s in ("status", "health", "metric", "report", "uptime")):
         return "status"
@@ -605,7 +607,9 @@ class BeaconMeshNetwork:
             if path.exists():
                 with open(path, "r") as f:
                     config = yaml.safe_load(f) or {}
-                personality_style = config.get("personality", {}).get("style", "default")
+                personality_style = config.get("personality", {}).get(
+                    "style", "default"
+                )
 
         peer = MeshPeer(
             identity=identity,
@@ -622,7 +626,9 @@ class BeaconMeshNetwork:
         )
         return identity
 
-    def register_agent(self, identity: BeaconIdentity, config: Optional[Dict[str, Any]] = None) -> None:
+    def register_agent(
+        self, identity: BeaconIdentity, config: Optional[Dict[str, Any]] = None
+    ) -> None:
         """Register an existing identity on the mesh.
 
         Args:
@@ -758,7 +764,9 @@ class BeaconMeshNetwork:
             envelope_type="reply",
         )
 
-    def on_message(self, agent_name: str, handler: Callable[[MeshEnvelope], None]) -> None:
+    def on_message(
+        self, agent_name: str, handler: Callable[[MeshEnvelope], None]
+    ) -> None:
         """Register a callback for inbound messages to an agent.
 
         Args:
@@ -838,13 +846,15 @@ class BeaconMeshNetwork:
         """
         nodes = []
         for name, peer in self.peers.items():
-            nodes.append({
-                "agent_name": name,
-                "beacon_id": peer.identity.beacon_id,
-                "public_key": peer.identity.public_key,
-                "personality_style": peer.personality_style,
-                "last_seen": peer.last_seen,
-            })
+            nodes.append(
+                {
+                    "agent_name": name,
+                    "beacon_id": peer.identity.beacon_id,
+                    "public_key": peer.identity.public_key,
+                    "personality_style": peer.personality_style,
+                    "last_seen": peer.last_seen,
+                }
+            )
 
         # Build edge set from envelope log
         edges: Dict[Tuple[str, str], int] = {}
@@ -853,8 +863,7 @@ class BeaconMeshNetwork:
             edges[key] = edges.get(key, 0) + 1
 
         edge_list = [
-            {"from": k[0], "to": k[1], "message_count": v}
-            for k, v in edges.items()
+            {"from": k[0], "to": k[1], "message_count": v} for k, v in edges.items()
         ]
 
         return {
@@ -885,10 +894,12 @@ class BeaconMeshNetwork:
                 results["valid"] += 1
             else:
                 results["invalid"] += 1
-                results["failures"].append({
-                    "index": i,
-                    "sender_id": env.sender_id,
-                    "nonce": env.nonce,
-                })
+                results["failures"].append(
+                    {
+                        "index": i,
+                        "sender_id": env.sender_id,
+                        "nonce": env.nonce,
+                    }
+                )
 
         return results

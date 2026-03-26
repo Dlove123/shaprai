@@ -4,11 +4,9 @@
 import pytest
 
 from shaprai.integrations.grazer.discovery import DiscoveredPost
-from shaprai.integrations.grazer.responder import (
-    GeneratedResponse,
-    GrazerResponder,
-    ResponderConfig,
-)
+from shaprai.integrations.grazer.responder import (GeneratedResponse,
+                                                   GrazerResponder,
+                                                   ResponderConfig)
 
 
 @pytest.fixture
@@ -133,7 +131,9 @@ class TestGrazerResponder:
             topics=["ai_agents"],
             relevance_score=0.9,
         )
-        score = responder._score_response("Great post! I agree with everything about ai_agents " * 5, post)
+        score = responder._score_response(
+            "Great post! I agree with everything about ai_agents " * 5, post
+        )
         assert score < 0.8  # Should be penalized for banned phrases
 
     def test_response_history(

@@ -22,10 +22,11 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-from shaprai.core.lifecycle import AgentState, transition_state, _load_manifest, _save_manifest
-from shaprai.sanctuary.quality_gate import QualityGate, ELYAN_CLASS_THRESHOLD
-from shaprai.sanctuary.principles import get_ethics_prompt, get_driftlock_anchors
-
+from shaprai.core.lifecycle import (AgentState, _load_manifest, _save_manifest,
+                                    transition_state)
+from shaprai.sanctuary.principles import (get_driftlock_anchors,
+                                          get_ethics_prompt)
+from shaprai.sanctuary.quality_gate import ELYAN_CLASS_THRESHOLD, QualityGate
 
 LESSON_CURRICULUM = {
     "pr_etiquette": {

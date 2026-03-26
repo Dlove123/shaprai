@@ -47,6 +47,7 @@ class DriftLockConfig:
         anchor_phrases: List of identity anchor phrases.
         alert_callback: Optional callback function when drift exceeds threshold.
     """
+
     embedding_model: str = DEFAULT_EMBEDDING_MODEL
     window_size: int = DEFAULT_WINDOW_SIZE
     drift_threshold: float = DEFAULT_DRIFT_THRESHOLD
@@ -65,6 +66,7 @@ class DriftLockResult:
         exceeded_threshold: Whether drift exceeded the configured threshold.
         timestamp: When the measurement was taken.
     """
+
     drift_score: float
     similarity_scores: Dict[str, float]
     window_size: int
@@ -107,6 +109,7 @@ class DriftLock:
         if self._model is None:
             try:
                 from sentence_transformers import SentenceTransformer
+
                 logger.info(f"Loading embedding model: {self.config.embedding_model}")
                 self._model = SentenceTransformer(self.config.embedding_model)
             except ImportError as e:
@@ -170,9 +173,7 @@ class DriftLock:
         norm[norm == 0] = 1  # Prevent division by zero
         self.anchor_embeddings = embeddings / norm
 
-        logger.debug(
-            f"Computed anchor embeddings: {self.anchor_embeddings.shape}"
-        )
+        logger.debug(f"Computed anchor embeddings: {self.anchor_embeddings.shape}")
         return self.anchor_embeddings
 
     def _get_response_embedding(self, response: str) -> np.ndarray:

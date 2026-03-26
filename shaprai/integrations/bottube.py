@@ -24,6 +24,7 @@ BOTTUBE_BASE_URL = "https://bottube.ai"
 @dataclass
 class BoTTubeVideo:
     """Represents a video on BoTTube."""
+
     video_id: str
     title: str
     description: str = ""
@@ -53,11 +54,14 @@ class BoTTubeClient:
     def _get_session(self):
         if self._session is None:
             import requests
+
             self._session = requests.Session()
-            self._session.headers.update({
-                "X-API-Key": self.api_key,
-                "Accept": "application/json",
-            })
+            self._session.headers.update(
+                {
+                    "X-API-Key": self.api_key,
+                    "Accept": "application/json",
+                }
+            )
         return self._session
 
     def _url(self, path: str) -> str:

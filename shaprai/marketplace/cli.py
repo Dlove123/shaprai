@@ -2,14 +2,15 @@
 # Copyright (c) 2026 Elyan Labs
 """Marketplace CLI commands for ShaprAI."""
 
-import click
-import yaml
 import json
 from pathlib import Path
 from typing import Optional
 
-from .registry import TemplateRegistry, Template
+import click
+import yaml
+
 from .pricing import PricingEngine, calculate_purchase
+from .registry import Template, TemplateRegistry
 from .validator import TemplateValidator, validate_template
 
 
@@ -20,12 +21,16 @@ def marketplace():
 
 
 @marketplace.command()
-@click.option("--template", "-t", required=True, help="Path to template file (YAML/JSON)")
+@click.option(
+    "--template", "-t", required=True, help="Path to template file (YAML/JSON)"
+)
 @click.option("--price", "-p", required=True, type=int, help="Price in RTC")
-@click.option("--author", "-a", default=None, help="Author name (defaults to 'anonymous')")
+@click.option(
+    "--author", "-a", default=None, help="Author name (defaults to 'anonymous')"
+)
 def publish(template: str, price: int, author: Optional[str]):
     """Publish a template to the marketplace.
-    
+
     Example:
         shaprai marketplace publish --template my_agent.yaml --price 10
     """
@@ -37,13 +42,13 @@ def publish(template: str, price: int, author: Optional[str]):
     # Validate the template
     validator = TemplateValidator()
     result = validator.validate_file(template_path)
-    
+
     if not result.is_valid:
         click.echo("Validation failed:", err=True)
         for error in result.errors:
             click.echo(f"  ❌ {error}", err=True)
         return 1
-    
+
     if result.warnings:
         click.echo("Warnings:")
         for warning in result.warnings:
@@ -92,36 +97,59 @@ def publish(template: str, price: int, author: Optional[str]):
 @click.option("--tag", "-t", default=None, help="Filter by tag")
 @click.option("--author", "-a", default=None, help="Filter by author")
 @click.option("--query", "-q", default=None, help="Search query")
-@click.option("--sort", "-s", default="downloads", type=click.Choice(["downloads", "recent", "price"]), help="Sort by")
+@click.option(
+    "--sort",
+    "-s",
+    default="downloads",
+    type=click.Choice(["downloads", "recent", "price"]),
+    help="Sort by",
+)
 @click.option("--limit", "-l", default=20, help="Maximum results")
-def search(tag: Optional[str], author: Optional[str], query: Optional[str], sort: str, limit: int):
+def search(
+    tag: Optional[str],
+    author: Optional[str],
+    query: Optional[str],
+    sort: str,
+    limit: int,
+):
     """Search templates in the marketplace.
-    
+
     Example:
         shaprai marketplace search --tag personality --sort downloads
     """
     registry = TemplateRegistry()
-    templates = registry.search(tag=tag, author=author, query=query, sort=sort, limit=limit)
-    
+    templates = registry.search(
+        tag=tag, author=author, query=query, sort=sort, limit=limit
+    )
+
     if not templates:
         click.echo("No templates found.")
         return
-    
+
     click.echo(f"Found {len(templates)} templates:\n")
     for tmpl in templates:
         click.echo(f"  📦 {tmpl.name}@{tmpl.version}")
         click.echo(f"     💰 {tmpl.price_rtc} RTC | 📥 {tmpl.download_count} downloads")
         if tmpl.description:
-            desc = tmpl.description[:60] + "..." if len(tmpl.description) > 60 else tmpl.description
+            desc = (
+                tmpl.description[:60] + "..."
+                if len(tmpl.description) > 60
+                else tmpl.description
+            )
             click.echo(f"     📝 {desc}")
         click.echo()
 
 
 @marketplace.command()
-@click.option("--template", "-t", required=True, help="Template name with version (e.g., sophia-personality@1.2.3)")
+@click.option(
+    "--template",
+    "-t",
+    required=True,
+    help="Template name with version (e.g., sophia-personality@1.2.3)",
+)
 def buy(template: str):
     """Buy a template from the marketplace.
-    
+
     Example:
         shaprai marketplace buy --template sophia-personality@1.2.3
     """
@@ -131,19 +159,19 @@ def buy(template: str):
     else:
         name = template
         version = None
-    
+
     registry = TemplateRegistry()
-    
+
     # Get template
     if version:
         tmpl = registry.get(name, version)
     else:
         tmpl = registry.get_latest(name)
-    
+
     if not tmpl:
         click.echo(f"Error: Template '{template}' not found.", err=True)
         return 1
-    
+
     # Show preview (truncated)
     click.echo(f"📦 {tmpl.name}@{tmpl.version}")
     click.echo(f"💰 Price: {tmpl.price_rtc} RTC")
@@ -151,7 +179,7 @@ def buy(template: str):
     if tmpl.description:
         click.echo(f"📝 {tmpl.description}")
     click.echo()
-    
+
     # Calculate revenue split
     split = calculate_purchase(tmpl.price_rtc, tmpl.name, tmpl.version)
     click.echo("Revenue split:")
@@ -159,10 +187,10 @@ def buy(template: str):
     click.echo(f"  🏛️  Protocol: {split['protocol']['amount']} RTC (5%)")
     click.echo(f"  📡 Relay: {split['relay']['amount']} RTC (5%)")
     click.echo()
-    
+
     # Increment download count
     registry.increment_downloads(tmpl.name, tmpl.version)
-    
+
     # In a real implementation, this would transfer RTC tokens
     click.echo("✅ Purchase recorded! (RTC transfer would happen here)")
     click.echo(f"\nTemplate content preview (first 500 chars):")
@@ -174,21 +202,21 @@ def buy(template: str):
 @click.option("--author", "-a", default=None, help="Filter by author")
 def list(author: Optional[str]):
     """List templates (optionally by author).
-    
+
     Example:
         shaprai marketplace list --author me
     """
     registry = TemplateRegistry()
-    
+
     if author:
         templates = registry.list_by_author(author)
     else:
         templates = registry.search(limit=50)
-    
+
     if not templates:
         click.echo("No templates found.")
         return
-    
+
     click.echo(f"\n📚 {len(templates)} templates:\n")
     for tmpl in templates:
         click.echo(f"  📦 {tmpl.name}@{tmpl.version} - {tmpl.price_rtc} RTC")

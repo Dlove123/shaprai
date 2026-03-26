@@ -7,11 +7,12 @@ are preserved when running through the CrewAI runtime adapter.
 Bounty: https://github.com/Scottcjn/shaprai/issues/71
 """
 
-import yaml
+import json
 import os
 import sys
-import json
 from pathlib import Path
+
+import yaml
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -78,7 +79,7 @@ def build_code_review_crew(manifest: dict) -> tuple:
         name=manifest["name"],
         role="Code Reviewer",
         goal="Provide thorough, principled code reviews that catch real issues "
-             "and teach the author something. Never rubber-stamp.",
+        "and teach the author something. Never rubber-stamp.",
         backstory=backstory,
         model=manifest.get("model", {}).get("base", "gpt-4"),
     )
@@ -135,13 +136,15 @@ def main():
     all_anchors_present = all(driftlock_results.values())
     for anchor, present in driftlock_results.items():
         status = "✓" if present else "✗"
-        print(f"  {status} \"{anchor}\"")
+        print(f'  {status} "{anchor}"')
     print(f"  Result: {'PASS' if all_anchors_present else 'FAIL'}")
 
     # 4. Verify anti-pattern enforcement (SophiaCore ethics)
     print("\n--- Anti-Pattern Enforcement ---")
     ap_results = verify_antipatterns(agent)
-    print(f"  Ethics prompt injected: {'✓' if ap_results['ethics_prompt_present'] else '✗'}")
+    print(
+        f"  Ethics prompt injected: {'✓' if ap_results['ethics_prompt_present'] else '✗'}"
+    )
     print(f"  Ethics prompt size: {ap_results['ethics_prompt_length']} chars")
     print(f"  Total backstory size: {ap_results['backstory_length']} chars")
     print(f"  Result: {'PASS' if ap_results['ethics_prompt_present'] else 'FAIL'}")
@@ -167,12 +170,18 @@ def main():
     direct_agent = ShaprCrewAgent.from_manifest(manifest)
     runtime_agent = agent
 
-    print(f"  Direct agent backstory includes ethics: "
-          f"{'✓' if get_ethics_prompt() in direct_agent.backstory else '✗'}")
-    print(f"  Runtime agent backstory includes ethics: "
-          f"{'✓' if get_ethics_prompt() in runtime_agent.backstory else '✗'}")
-    print(f"  Both preserve SophiaCore: "
-          f"{'✓ MATCH' if (get_ethics_prompt() in direct_agent.backstory) == (get_ethics_prompt() in runtime_agent.backstory) else '✗ MISMATCH'}")
+    print(
+        f"  Direct agent backstory includes ethics: "
+        f"{'✓' if get_ethics_prompt() in direct_agent.backstory else '✗'}"
+    )
+    print(
+        f"  Runtime agent backstory includes ethics: "
+        f"{'✓' if get_ethics_prompt() in runtime_agent.backstory else '✗'}"
+    )
+    print(
+        f"  Both preserve SophiaCore: "
+        f"{'✓ MATCH' if (get_ethics_prompt() in direct_agent.backstory) == (get_ethics_prompt() in runtime_agent.backstory) else '✗ MISMATCH'}"
+    )
 
     # 8. Summary
     print("\n" + "=" * 60)
@@ -181,7 +190,9 @@ def main():
     print(f"  Template:          {manifest['name']}")
     print(f"  Runtime:           CrewAI")
     print(f"  DriftLock:         {'PRESERVED' if all_anchors_present else 'BROKEN'}")
-    print(f"  Anti-patterns:     {'ENFORCED' if ap_results['ethics_prompt_present'] else 'MISSING'}")
+    print(
+        f"  Anti-patterns:     {'ENFORCED' if ap_results['ethics_prompt_present'] else 'MISSING'}"
+    )
     print(f"  Voice match:       Both agents carry SophiaCore + personality")
     print(f"  Task:              Real code review (token transfer vulnerability)")
     print("=" * 60)

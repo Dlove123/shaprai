@@ -5,39 +5,28 @@
 Covers the GitHub triage, content summarizer, and code review agents.
 """
 
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
 
 # Ensure examples are importable
 sys.path.insert(0, str(Path(__file__).parent.parent / "examples"))
 
-from examples.github_triage_agent import (
-    TriageResult,
-    score_priority,
-    suggest_labels,
-    find_duplicates,
-    triage_issue,
-    demo_triage,
-)
-from examples.content_summarizer_agent import (
-    Summary,
-    summarize_text,
-    summarize_pr_diff,
-    summarize_thread,
-)
-from examples.code_review_agent import (
-    ReviewFinding,
-    ReviewReport,
-    review_code,
-    review_pr_comment,
-)
+from examples.code_review_agent import (ReviewFinding, ReviewReport,
+                                        review_code, review_pr_comment)
+from examples.content_summarizer_agent import (Summary, summarize_pr_diff,
+                                               summarize_text,
+                                               summarize_thread)
+from examples.github_triage_agent import (TriageResult, demo_triage,
+                                          find_duplicates, score_priority,
+                                          suggest_labels, triage_issue)
 from shaprai.sanctuary.quality_gate import QualityGate
-
 
 # ═══════════════════════════════════════════════════════════
 # GitHub Triage Agent Tests
 # ═══════════════════════════════════════════════════════════
+
 
 class TestScorePriority:
     def test_critical_keywords(self):
@@ -139,6 +128,7 @@ class TestTriageIssue:
 # Content Summarizer Agent Tests
 # ═══════════════════════════════════════════════════════════
 
+
 class TestSummarizeText:
     def test_basic_summary(self):
         text = (
@@ -158,7 +148,9 @@ class TestSummarizeText:
         assert result.summary_text == "(empty input)"
 
     def test_single_sentence(self):
-        result = summarize_text("This is a single sentence about testing.", max_sentences=1)
+        result = summarize_text(
+            "This is a single sentence about testing.", max_sentences=1
+        )
         assert len(result.summary_text) > 0
 
     def test_key_points_extracted(self):
@@ -220,6 +212,7 @@ class TestSummarizeThread:
 # ═══════════════════════════════════════════════════════════
 # Code Review Agent Tests
 # ═══════════════════════════════════════════════════════════
+
 
 class TestReviewCode:
     def test_hardcoded_secrets(self):

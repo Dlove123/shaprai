@@ -30,12 +30,19 @@ from typing import Any, Dict, List, Optional, Tuple
 # Allow running from repo root
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shaprai.integrations.elyan_ecosystem import ElyanEcosystem, EcosystemConfig
-
+from shaprai.integrations.elyan_ecosystem import (EcosystemConfig,
+                                                  ElyanEcosystem)
 
 # ── Priority keywords ────────────────────────────────────────
 
-CRITICAL_KEYWORDS = ["crash", "data loss", "security", "vulnerability", "exploit", "cve"]
+CRITICAL_KEYWORDS = [
+    "crash",
+    "data loss",
+    "security",
+    "vulnerability",
+    "exploit",
+    "cve",
+]
 HIGH_KEYWORDS = ["bug", "broken", "error", "fail", "regression", "blocker"]
 MEDIUM_KEYWORDS = ["enhancement", "feature", "improvement", "request"]
 LOW_KEYWORDS = ["docs", "typo", "cosmetic", "style", "nit", "question"]
@@ -205,12 +212,36 @@ def demo_triage() -> List[TriageResult]:
         List of TriageResult for the sample issues.
     """
     sample_issues = [
-        {"number": 101, "title": "Server crash on epoch settlement", "body": "Node crashes with segfault during epoch 450 settlement."},
-        {"number": 102, "title": "Add dark mode to block explorer", "body": "Feature request: dark mode theme for the explorer UI."},
-        {"number": 103, "title": "Typo in README installation section", "body": "Line 42 says 'pip instal' instead of 'pip install'."},
-        {"number": 104, "title": "Security vulnerability in wallet transfer endpoint", "body": "The /wallet/transfer endpoint accepts unauthenticated requests."},
-        {"number": 105, "title": "Node crash during epoch settlement", "body": "Similar to #101, node goes down at settlement time."},
-        {"number": 106, "title": "Bounty: Add SPARC miner support (50 RTC)", "body": "Implement SPARC architecture detection in fingerprint_checks.py."},
+        {
+            "number": 101,
+            "title": "Server crash on epoch settlement",
+            "body": "Node crashes with segfault during epoch 450 settlement.",
+        },
+        {
+            "number": 102,
+            "title": "Add dark mode to block explorer",
+            "body": "Feature request: dark mode theme for the explorer UI.",
+        },
+        {
+            "number": 103,
+            "title": "Typo in README installation section",
+            "body": "Line 42 says 'pip instal' instead of 'pip install'.",
+        },
+        {
+            "number": 104,
+            "title": "Security vulnerability in wallet transfer endpoint",
+            "body": "The /wallet/transfer endpoint accepts unauthenticated requests.",
+        },
+        {
+            "number": 105,
+            "title": "Node crash during epoch settlement",
+            "body": "Similar to #101, node goes down at settlement time.",
+        },
+        {
+            "number": 106,
+            "title": "Bounty: Add SPARC miner support (50 RTC)",
+            "body": "Implement SPARC architecture detection in fingerprint_checks.py.",
+        },
     ]
 
     results = []

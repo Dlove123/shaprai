@@ -9,7 +9,7 @@ model, personality, capabilities, ethics, and DriftLock configuration.
 from __future__ import annotations
 
 import copy
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -39,7 +39,9 @@ class AgentTemplate:
     capabilities: List[str] = field(default_factory=list)
     platforms: List[str] = field(default_factory=list)
     ethics_profile: str = "sophiacore_default"
-    driftlock: Dict[str, Any] = field(default_factory=lambda: {"enabled": True, "check_interval": 25})
+    driftlock: Dict[str, Any] = field(
+        default_factory=lambda: {"enabled": True, "check_interval": 25}
+    )
     description: str = ""
     version: str = "1.0"
     rtc_config: Dict[str, Any] = field(default_factory=dict)

@@ -9,6 +9,7 @@ from typing import Dict, Optional
 @dataclass
 class RevenueSplit:
     """Revenue split for a template purchase."""
+
     creator_amount: int  # 90% to creator
     protocol_amount: int  # 5% to ShaprAI development fund
     relay_amount: int  # 5% to relay node
@@ -29,20 +30,24 @@ class PricingEngine:
     def __init__(self, relay_node_id: Optional[str] = None):
         self.relay_node_id = relay_node_id
 
-    def calculate_split(self, price_rtc: int, template_name: str, template_version: str) -> RevenueSplit:
+    def calculate_split(
+        self, price_rtc: int, template_name: str, template_version: str
+    ) -> RevenueSplit:
         """Calculate revenue split for a purchase.
-        
+
         Args:
             price_rtc: Total RTC price
             template_name: Name of the template
             template_version: Version of the template
-            
+
         Returns:
             RevenueSplit with amounts for each party
         """
         creator_amount = int(price_rtc * self.CREATOR_SHARE)
         protocol_amount = int(price_rtc * self.PROTOCOL_SHARE)
-        relay_amount = price_rtc - creator_amount - protocol_amount  # Ensure we don't lose any RTC due to rounding
+        relay_amount = (
+            price_rtc - creator_amount - protocol_amount
+        )  # Ensure we don't lose any RTC due to rounding
 
         return RevenueSplit(
             creator_amount=creator_amount,
@@ -55,13 +60,13 @@ class PricingEngine:
 
     def validate_price(self, price_rtc: int) -> bool:
         """Validate a template price.
-        
+
         Args:
             price_rtc: Proposed price in RTC
-            
+
         Returns:
             True if price is valid
-            
+
         Raises:
             ValueError: If price is invalid
         """
@@ -88,14 +93,16 @@ class PricingEngine:
         return self.RELAY_SHARE * 100
 
 
-def calculate_purchase(price_rtc: int, template_name: str, template_version: str) -> Dict:
+def calculate_purchase(
+    price_rtc: int, template_name: str, template_version: str
+) -> Dict:
     """Convenience function to calculate a purchase.
-    
+
     Args:
         price_rtc: Total RTC price
         template_name: Name of the template
         template_version: Version of the template
-        
+
     Returns:
         Dict with revenue split details
     """

@@ -109,12 +109,15 @@ class ElyanEcosystem:
         if self._session is None:
             try:
                 import requests
+
                 self._session = requests.Session()
                 self._session.verify = False  # Self-signed certs on RustChain VPS
                 if self.config.admin_key:
                     self._session.headers["X-Admin-Key"] = self.config.admin_key
             except ImportError:
-                logger.warning("requests not installed -- network calls will be skipped")
+                logger.warning(
+                    "requests not installed -- network calls will be skipped"
+                )
                 return None
         return self._session
 
@@ -392,12 +395,15 @@ class ElyanEcosystem:
             BoTTubeClient instance, or None if no API key is available.
         """
         profile = self._profiles.get(agent_name)
-        api_key = (profile.bottube_api_key if profile else "") or self.config.bottube_api_key
+        api_key = (
+            profile.bottube_api_key if profile else ""
+        ) or self.config.bottube_api_key
         if not api_key:
             logger.warning("No BoTTube API key available for agent '%s'", agent_name)
             return None
 
         from shaprai.integrations.bottube import BoTTubeClient
+
         return BoTTubeClient(api_key=api_key, base_url=self.config.bottube_url)
 
     def browse_bottube_feed(

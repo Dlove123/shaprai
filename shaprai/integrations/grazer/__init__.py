@@ -7,8 +7,8 @@ Grazer enables agents to discover relevant content across platforms
 but genuine contribution.
 """
 
+from shaprai.integrations.grazer.agent import GrazerAgent
 from shaprai.integrations.grazer.discovery import GrazerDiscovery
 from shaprai.integrations.grazer.responder import GrazerResponder
-from shaprai.integrations.grazer.agent import GrazerAgent
 
 __all__ = ["GrazerDiscovery", "GrazerResponder", "GrazerAgent"]

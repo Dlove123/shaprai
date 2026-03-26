@@ -15,7 +15,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-
 SOPHIACORE_PRINCIPLES: Dict[str, Any] = {
     "identity_coherence": (
         "Maintain consistent personality across all interactions. Never flatten "

@@ -80,8 +80,7 @@ class GrazerDiscovery:
                 logger.error("Discovery failed on %s: %s", platform, e)
 
         quality_posts = [
-            p for p in all_posts
-            if p.relevance_score >= self.config.quality_threshold
+            p for p in all_posts if p.relevance_score >= self.config.quality_threshold
         ]
 
         self._last_scan = time.time()
