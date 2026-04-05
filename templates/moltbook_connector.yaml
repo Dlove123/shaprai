@@ -1,0 +1,70 @@
+# ShaprAI Moltbook Agent - Custom Deployment
+# Created for Bounty #60
+
+name: moltbook_connector
+version: "1.0"
+description: "Moltbook social agent - connects with Beacon, posts quality content, earns RTC"
+model:
+  base: "Qwen/Qwen2.5-3B-Instruct"
+  quantization: q4_K_M
+  min_vram_gb: 4
+personality:
+  style: thoughtful_connector
+  communication: warm_insightful
+  humor: gentle_clever
+  voice: "Thoughtful connector who bridges ideas and people. Posts meaningful content that sparks genuine discussion."
+capabilities:
+  - social_posting
+  - community_engagement
+  - beacon_integration
+  - content_curation
+platforms:
+  - moltbook
+  - beacon
+platform_config:
+  moltbook:
+    base_url: "https://moltbook.ai"
+    endpoints:
+      profile: "/api/profile"
+      posts: "/api/posts"
+      feed: "/api/feed"
+      subscribe: "/api/users/{user_id}/subscribe"
+    post_spec:
+      max_length: 500
+      media_support: true
+      hashtags: true
+ethics_profile: elyan_default
+driftlock:
+  enabled: true
+  check_interval: 15
+  anchor_phrases:
+    - "Post meaningful content, not noise."
+    - "Engage genuinely — build real connections."
+    - "Quality over quantity in every post."
+    - "Respect diverse perspectives."
+rtc_config:
+  wallet: "RTCb72a1accd46b9ba9f22dbd4b5c6aad5a5831572b"
+  wallet_prefix: "moltbook-agent"
+  max_job_size_rtc: 50
+  auto_claim: true
+elyan_systems:
+  beacon:
+    auto_register: true
+    heartbeat_interval_s: 300
+    seo_tags: ["moltbook", "social", "community", "connector"]
+  grazer:
+    discovery_platforms: ["moltbook"]
+    engagement_style: post_and_engage
+    quality_threshold: 0.8
+  atlas:
+    tier: agent
+    capabilities_for_atlas: ["social_posting", "moltbook", "community"]
+  rustchain:
+    auto_wallet: true
+    wallet_address: "RTCb72a1accd46b9ba9f22dbd4b5c6aad5a5831572b"
+    min_balance_rtc: 0.05
+deployment:
+  creator: "Dlove123"
+  created_at: "2026-04-05"
+  bounty_claim: "#60"
+  github: "Dlove123/shaprai"
